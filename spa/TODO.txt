@@ -1,10 +1,11 @@
 Enable creation of projects that consist of multiple files and that can be run as a whole
 Enable invoking R from JavaScript
-
-MAJOR
 Create visualization templates to more easily create visualizations of different types
 
-MINOR
+BUGS
+- Editor 'undo' does not mark the file as changed
+
+MINOR FEATURES
 - StreamEditor: streaming sources are stored with full (platform dependent) filename of the stream, make the filename relative to the path of the stream source
 - StreamEditor: there are various moments at which file loading can go wrong, take care of proper error reporting 
 
@@ -22,6 +23,6 @@ MINOR
 
 - VariablesWindow: put functions in a separate list, do not list the contents of the function
 
-MAJOR
+MAJOR FEATURES
 Replace internal frames with split panes
 Java objects cannot be used, because they cannot be serialized to JSON. Serialize them using Java Serializable instead.
