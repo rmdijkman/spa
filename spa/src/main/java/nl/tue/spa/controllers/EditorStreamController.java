@@ -273,4 +273,11 @@ public class EditorStreamController extends EditorController {
 			fileLoader = null;
 		}
 	}
+
+	public void fileChanged() {
+		if (saved){
+			saved = false;
+			Environment.getEditorContainerController().updateSavedState();
+		}
+	}
 }

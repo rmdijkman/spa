@@ -2,9 +2,6 @@ Enable creation of projects that consist of multiple files and that can be run a
 Enable invoking R from JavaScript
 Create visualization templates to more easily create visualizations of different types
 
-BUGS
-- StreamEditor does not mark the file as changed when anything happens
-
 MINOR FEATURES
 - Graph: enable showing errors from html panel
 - GUIEditor: facilitate indentation

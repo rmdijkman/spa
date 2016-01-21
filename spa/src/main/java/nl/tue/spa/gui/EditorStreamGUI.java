@@ -20,12 +20,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
 
-public class EditorStreamGUI extends JPanel implements EditorGUI {
+public class EditorStreamGUI extends JPanel implements EditorGUI, ActionListener, KeyListener {
 	private static final long serialVersionUID = 1L;
 
 	public static EditorGUIType[] allEditorStreamGUITypes = {EditorGUIType.TYPE_STREAM};
@@ -64,6 +66,7 @@ public class EditorStreamGUI extends JPanel implements EditorGUI {
 		JButton btnFile = new JButton("...");
 		btnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				controller.fileChanged();
 				controller.loadCSV();
 			}
 		});
@@ -86,23 +89,28 @@ public class EditorStreamGUI extends JPanel implements EditorGUI {
 		
 		rdbtnExcel = new JRadioButton("Excel");
 		rdbtnExcel.setBounds(175, 85, 61, 23);
+		rdbtnExcel.addActionListener(this);
 		add(rdbtnExcel);
 		
 		rdbtnDefault = new JRadioButton("Default");
 		rdbtnDefault.setSelected(true);
 		rdbtnDefault.setBounds(100, 85, 75, 23);
+		rdbtnDefault.addActionListener(this);
 		add(rdbtnDefault);
 		
 		rdbtnMySQL = new JRadioButton("MySQL");
 		rdbtnMySQL.setBounds(238, 85, 75, 23);
+		rdbtnMySQL.addActionListener(this);
 		add(rdbtnMySQL);
 		
 		rdbtnRFC4180 = new JRadioButton("RFC 4180");
 		rdbtnRFC4180.setBounds(315, 85, 80, 23);
+		rdbtnRFC4180.addActionListener(this);
 		add(rdbtnRFC4180);
 		
 		rdbtnTDF = new JRadioButton("TDF");
 		rdbtnTDF.setBounds(400, 85, 75, 23);
+		rdbtnTDF.addActionListener(this);
 		add(rdbtnTDF);
 		
 		ButtonGroup group = new ButtonGroup();
@@ -121,6 +129,7 @@ public class EditorStreamGUI extends JPanel implements EditorGUI {
 		txtDelimiter.setBounds(105, 111, 54, 28);
 		add(txtDelimiter);
 		txtDelimiter.setColumns(10);
+		txtDelimiter.addKeyListener(this);
 		
 		JLabel lblHasHeaderRow = new JLabel("Has header row:");
 		lblHasHeaderRow.setBounds(30, 149, 101, 14);
@@ -128,6 +137,7 @@ public class EditorStreamGUI extends JPanel implements EditorGUI {
 		
 		chkHasHeaderRow = new JCheckBox("");
 		chkHasHeaderRow.setBounds(142, 145, 97, 23);
+		chkHasHeaderRow.addActionListener(this);
 		add(chkHasHeaderRow);
 		
 		JButton btnRefresh = new JButton("");
@@ -150,6 +160,7 @@ public class EditorStreamGUI extends JPanel implements EditorGUI {
 		txtVariableName.setBounds(116, 443, 197, 28);
 		add(txtVariableName);
 		txtVariableName.setColumns(10);
+		txtVariableName.addKeyListener(this);
 	}
 	
 	public EditorStreamController getController() {
@@ -281,5 +292,23 @@ public class EditorStreamGUI extends JPanel implements EditorGUI {
 	        super.insertString(fb, i, string, as);
 
 	    }
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		controller.fileChanged();
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		controller.fileChanged();
 	}
 }
