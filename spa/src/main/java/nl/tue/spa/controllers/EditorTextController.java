@@ -86,11 +86,6 @@ public class EditorTextController extends EditorController implements KeyListene
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		if (saved){
-			saved = false;
-			Environment.getEditorContainerController().updateSavedState();
-		}
-		
 	}
 
 	@Override
@@ -108,14 +103,22 @@ public class EditorTextController extends EditorController implements KeyListene
 			}
 		}
 		if ((e.getKeyCode() == KeyEvent.VK_Z) && (e.isMetaDown() || e.isControlDown())){
-			gui.undo();
+			gui.undo();			
 		}else if ((e.getKeyCode() == KeyEvent.VK_Y) && (e.isMetaDown() || e.isControlDown())){
 			gui.redo();
+		}
+		if (saved){
+			saved = false;
+			Environment.getEditorContainerController().updateSavedState();
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		if (saved){
+			saved = false;
+			Environment.getEditorContainerController().updateSavedState();
+		}		
 	}
 	
 	public boolean save(boolean saveAs){

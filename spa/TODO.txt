@@ -3,7 +3,6 @@ Enable invoking R from JavaScript
 Create visualization templates to more easily create visualizations of different types
 
 BUGS
-- Editor 'undo' does not mark the file as changed
 - StreamEditor does not mark the file as changed when anything happens
 
 MINOR FEATURES
