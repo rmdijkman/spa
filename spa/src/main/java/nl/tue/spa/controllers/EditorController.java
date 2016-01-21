@@ -51,6 +51,10 @@ public abstract class EditorController implements GUIStateSerializable {
 
 	public boolean selectSaveFile(){
 		final JFileChooser fc = new JFileChooser();
+		String lastFolder = Environment.getProperties().getLastFolder();
+		if (lastFolder != null){
+			fc.setCurrentDirectory(new File(lastFolder));
+		}
 		fc.setAcceptAllFileFilterUsed(false);
 		FileNameExtensionFilter filter = new FileNameExtensionFilter(type.getName() + " (." + type.getSuffix() + ")", type.getSuffix());
 		fc.addChoosableFileFilter(filter);
@@ -62,6 +66,7 @@ public abstract class EditorController implements GUIStateSerializable {
 				file = new File(fc.getSelectedFile().getAbsolutePath() + "." + type.getSuffix());
 				fileName = file.getName();
 			}
+			Environment.getProperties().setLastFolder(file.getParent());
 			return true;
 		}
 		return false;		
@@ -69,12 +74,17 @@ public abstract class EditorController implements GUIStateSerializable {
 
 	public static EditorController load(){
 		final JFileChooser fc = new JFileChooser();
+		String lastFolder = Environment.getProperties().getLastFolder();
+		if (lastFolder != null){
+			fc.setCurrentDirectory(new File(lastFolder));
+		}
 		for (EditorGUIType type: EditorGUI.allEditorGUITypes){
 			FileNameExtensionFilter filter = new FileNameExtensionFilter(type.getName() + " (." + type.getSuffix() + ")", type.getSuffix());
 			fc.addChoosableFileFilter(filter);
 		}
 		int returnVal = Environment.getMainController().showDialog(fc, "Load");
 		if (returnVal == JFileChooser.APPROVE_OPTION){
+			Environment.getProperties().setLastFolder(fc.getSelectedFile().getParent());
 			return load(fc.getSelectedFile().getPath());
 		}
 		return null;

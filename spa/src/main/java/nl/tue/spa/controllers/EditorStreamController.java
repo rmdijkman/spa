@@ -178,6 +178,10 @@ public class EditorStreamController extends EditorController {
 
 	public void loadCSV() {
 		final JFileChooser fc = new JFileChooser();
+		String lastFolder = Environment.getProperties().getLastFolder();
+		if (lastFolder != null){
+			fc.setCurrentDirectory(new File(lastFolder));
+		}
 		fc.setAcceptAllFileFilterUsed(false);
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma Separated (.csv)", "csv");
 		fc.addChoosableFileFilter(filter);
@@ -185,6 +189,7 @@ public class EditorStreamController extends EditorController {
 		if (returnVal == JFileChooser.APPROVE_OPTION){
 			fileToLoad = fc.getSelectedFile().getAbsolutePath();
 			File f = new File(fileToLoad);
+			Environment.getProperties().setLastFolder(f.getParent());
 			gui.setFileName(f.getName());
 			loadHeaderFromCSV(f);
 			gui.setHeader(header);

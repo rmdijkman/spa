@@ -18,6 +18,7 @@ public class Environment {
 	private static ActiveController activeContoller;	
 	private static EditorContainerController editorContoller;
 	private static EventBus eventBus;
+	private static Properties properties;
 	
 	public static RProcessor getRProcessor(){
 		if (rProcessor == null){
@@ -68,7 +69,14 @@ public class Environment {
 		}
 		return eventBus;
 	}
-	
+
+	public static Properties getProperties(){
+		if (properties == null){
+			properties = new Properties();
+		}
+		return properties;
+	}
+
 	public static boolean isMac(){
 		return System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0;
 	}

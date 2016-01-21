@@ -17,6 +17,7 @@ import nl.tue.spa.core.guistate.GUIState;
 public class Main {
 	
 	public static void saveState(){
+		Environment.getProperties().saveProperties();
 		String stateFile = System.getProperty("user.home") + "/" + Environment.STATE_FILE;
 		try{
 			FileOutputStream fileOut = new FileOutputStream(stateFile);
@@ -30,6 +31,7 @@ public class Main {
 	}
 	
 	public static void restoreState(){
+		Environment.getProperties().loadProperties();
 		try{
 			String stateFile = System.getProperty("user.home") + "/" + Environment.STATE_FILE;
 			File f = new File(stateFile);
