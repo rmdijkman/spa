@@ -135,6 +135,11 @@ public class ConsoleController implements KeyListener, GUIStateSerializable {
 		Environment.getMainController().addWindow(gui);
 		gui.setVisible(true);
 	}
+	
+	public void log(String text){
+		gui.printEntry("\n");
+		printResult(new EvaluationResult(text, ResultType.ERROR));
+	}
 
 	@Override
 	public GUIState getState() {

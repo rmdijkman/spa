@@ -26,6 +26,7 @@
 
       //Test by giving in the console: marker = {lat: 51.450095, lng: 5.493081}
       function update(variable, value){
+        java.log("test");
         if (value.position == undefined){
           m = title2Marker[value.title];
           m.setMap(null);

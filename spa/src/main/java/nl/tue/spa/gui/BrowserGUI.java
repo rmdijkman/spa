@@ -56,13 +56,14 @@ public class BrowserGUI extends JInternalFrame{
                 WebView view = new WebView();
                 engine = view.getEngine();
                 jfxPanel.setScene(new Scene(view));
-				engine.loadContent(content);
             	JSObject window = (JSObject) engine.executeScript("window");
+                engine.loadContent(content);
             	window.setMember("eventBus", Environment.getEventBus());
+            	window.setMember("java", Environment.getConsoleController());
             }
         });
 	}
-	
+		
 	public void executeJavaScript(String script){
         Platform.runLater(new Runnable() {
             @Override 
@@ -75,5 +76,5 @@ public class BrowserGUI extends JInternalFrame{
             	}
             }
         });		
-	}
+	}	
 }
