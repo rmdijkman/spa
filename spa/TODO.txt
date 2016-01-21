@@ -3,7 +3,6 @@ Enable invoking R from JavaScript
 Create visualization templates to more easily create visualizations of different types
 
 MINOR FEATURES
-- Graph: enable showing errors from html panel
 - GUIEditor: facilitate indentation
 
 - StreamEditor: streaming sources are stored with full (platform dependent) filename of the stream, make the filename relative to the path of the stream source
@@ -19,6 +18,7 @@ MINOR FEATURES
 - Console: on get focus: move cursor to end of document
 
 - Graph: graph windows are never destroyed, just made invisible. This is a potential memory leak. Always keep one in memory to prevent JFX from closing.
+- Graph: enable showing errors from html panel (this proves much harder than it would seem)
 
 - VariablesWindow: put functions in a separate list, do not list the contents of the function
 

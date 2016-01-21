@@ -22,14 +22,17 @@
         map = new google.maps.Map(mapCanvas, mapOptions);
         title2Marker = {};
         eventBus.subscribe("map.gs","marker");
+        console.log("log");
       }
 
-      //Test by giving in the console: marker = {lat: 51.450095, lng: 5.493081}
+      //Test by giving in the console: marker = {title: 'test', position: {lat: 51.450095, lng: 5.493081}}
       function update(variable, value){
-        java.log("test");
+        console.log("log update");
         if (value.position == undefined){
           m = title2Marker[value.title];
-          m.setMap(null);
+          if (m != null){
+            m.setMap(null);
+          }
           title2Marker[value.title] = null;
         }else{
           m = title2Marker[value.title];

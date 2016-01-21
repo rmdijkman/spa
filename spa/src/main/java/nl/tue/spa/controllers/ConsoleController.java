@@ -137,8 +137,10 @@ public class ConsoleController implements KeyListener, GUIStateSerializable {
 	}
 	
 	public void log(String text){
-		gui.printEntry("\n");
-		printResult(new EvaluationResult(text, ResultType.ERROR));
+		gui.printError("\n" + text + "\n");
+		gui.printPrompt();
+		gui.setCaretPosition(gui.getTextLength());
+		caretPosition = gui.getCaretPosition();
 	}
 
 	@Override

@@ -57,9 +57,10 @@ public class BrowserGUI extends JInternalFrame{
                 engine = view.getEngine();
                 jfxPanel.setScene(new Scene(view));
             	JSObject window = (JSObject) engine.executeScript("window");
+            	window.setMember("java", Environment.getConsoleController());
+            	engine.executeScript("console.log = function(message){java.log(message);};");
                 engine.loadContent(content);
             	window.setMember("eventBus", Environment.getEventBus());
-            	window.setMember("java", Environment.getConsoleController());
             }
         });
 	}
