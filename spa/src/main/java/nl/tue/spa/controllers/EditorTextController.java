@@ -111,10 +111,18 @@ public class EditorTextController extends EditorController implements KeyListene
 			saved = false;
 			Environment.getEditorContainerController().updateSavedState();
 		}
+		if (saved){
+			saved = false;
+			Environment.getEditorContainerController().updateSavedState();
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		if (saved){
+			saved = false;
+			Environment.getEditorContainerController().updateSavedState();
+		}		
 	}
 	
 	public boolean save(boolean saveAs){
