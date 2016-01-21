@@ -3,10 +3,12 @@ Enable invoking R from JavaScript
 Create visualization templates to more easily create visualizations of different types
 
 BUGS
-- Editor 'undo' does not mark the file as changed
 - StreamEditor does not mark the file as changed when anything happens
 
 MINOR FEATURES
+- Graph: enable showing errors from html panel
+- GUIEditor: facilitate indentation
+
 - StreamEditor: streaming sources are stored with full (platform dependent) filename of the stream, make the filename relative to the path of the stream source
 - StreamEditor: there are various moments at which file loading can go wrong, take care of proper error reporting 
 
@@ -19,7 +21,6 @@ MINOR FEATURES
 
 - Console: on get focus: move cursor to end of document
 
-- Graph: enable showing errors from html panel
 - Graph: graph windows are never destroyed, just made invisible. This is a potential memory leak. Always keep one in memory to prevent JFX from closing.
 
 - VariablesWindow: put functions in a separate list, do not list the contents of the function
