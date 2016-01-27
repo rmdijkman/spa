@@ -1,19 +1,14 @@
-Enable creation of projects that consist of multiple files and that can be run as a whole
 Enable invoking R from JavaScript
 Create visualization templates to more easily create visualizations of different types
 
 MINOR FEATURES
-- GUIEditor: facilitate indentation
+- GUIEditor: make sure that setSaved is only triggered when the document is actually changed (not just on key press) 
 
 - StreamEditor: streaming sources are stored with full (platform dependent) filename of the stream, make the filename relative to the path of the stream source
 - StreamEditor: there are various moments at which file loading can go wrong, take care of proper error reporting 
 
 - GUIEditor: on close, bring the window that asks to be saved to the front
 - GUIEditor: on open, set focus to the textPane, such that text can be entered right away
-- GUIEditor (Mac): select all
-- GUIEditor (Mac): cut
-- GUIEditor (Mac): activate home, end, next word key combinations
-- GUIEditor: script pretty printing with colors
 
 - Console: on get focus: move cursor to end of document
 

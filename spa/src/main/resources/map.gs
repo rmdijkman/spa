@@ -46,7 +46,7 @@
           }
           m.setPosition(value.position);
         }
-      }
+      }      
 
       google.maps.event.addDomListener(window, 'load', initialize);
         </script>

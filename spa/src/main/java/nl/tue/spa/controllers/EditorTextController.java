@@ -11,7 +11,6 @@ import java.nio.file.Files;
 
 import javax.swing.JOptionPane;
 
-import nl.tue.spa.core.AppClipboard;
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.executor.EvaluationResult;
@@ -90,23 +89,6 @@ public class EditorTextController extends EditorController implements KeyListene
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (Environment.isMac()){ //For Mac OS, we must implement CMD-C, CMD-V
-			if ((e.getKeyCode() == KeyEvent.VK_C) && e.isMetaDown()){
-				String selectedText = gui.getSelectedText();
-				if (selectedText != null){
-					AppClipboard.toClipboard(selectedText);
-				}
-			}
-			if ((e.getKeyCode() == KeyEvent.VK_V) && e.isMetaDown()){			
-				String selectedText = AppClipboard.fromClipboard();
-				gui.insertText(gui.getCaretPosition(), selectedText);
-			}
-		}
-		if ((e.getKeyCode() == KeyEvent.VK_Z) && (e.isMetaDown() || e.isControlDown())){
-			gui.undo();			
-		}else if ((e.getKeyCode() == KeyEvent.VK_Y) && (e.isMetaDown() || e.isControlDown())){
-			gui.redo();
-		}
 	}
 
 	@Override
