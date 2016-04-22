@@ -42,6 +42,15 @@ public class EditorContainerController implements GUIStateSerializable{
 		}
 		return true;
 	}
+	
+	public EditorTextController getEditorTextController(String fileName){
+		for (EditorController ec: editorWindows){
+			if ((ec instanceof EditorTextController) && (ec.getFileName().equals(fileName))){
+				return (EditorTextController) ec;
+			}
+		}
+		return null;
+	}
 
 	public void newJavaScriptFile() {
 		EditorController ec = new EditorTextController(EditorGUIType.TYPE_JAVA_SCRIPT);

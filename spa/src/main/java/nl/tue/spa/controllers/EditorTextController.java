@@ -11,6 +11,9 @@ import java.nio.file.Files;
 
 import javax.swing.JOptionPane;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.executor.EvaluationResult;
@@ -23,10 +26,14 @@ import nl.tue.spa.gui.EditorGUI.EditorGUIType;
 public class EditorTextController extends EditorController implements KeyListener {
 
 	EditorTextGUI gui;
+	Context context;
+	Scriptable scope;
 	
 	public EditorTextController() {
 		this.gui = new EditorTextGUI(this);
 		saved = false;
+		context = JavaProcessor.initializeContext();
+		scope = JavaProcessor.initializeScope(context);
 	}
 
 	public EditorTextController(EditorGUIType type) {
@@ -36,7 +43,7 @@ public class EditorTextController extends EditorController implements KeyListene
 	
 	public void runJavaScript() {
 		MainController mc = Environment.getMainController();
-		EvaluationResult er = JavaProcessor.evaluateScript(gui.getScript(), "");
+		EvaluationResult er = JavaProcessor.evaluateScript(context, scope, gui.getScript(), "");
 		if (er.getType() != ResultType.UNDEFINED){
 			mc.printEntry("\n");
 			mc.printResult(er);
@@ -166,5 +173,11 @@ public class EditorTextController extends EditorController implements KeyListene
 			saved = ec.saved;
 			Environment.getEditorContainerController().updateSavedState();
 		}
+	}
+
+	public void executeJavaScript(String script) {
+		MainController mc = Environment.getMainController();
+		JavaProcessor.evaluateScript(context, scope, script, "");
+		mc.updateJavaScope();
 	}	
 }

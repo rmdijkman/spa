@@ -14,11 +14,9 @@ public class JavaProcessor {
 
 	private static Map<String,String> variables = new HashMap<String,String>(); //Shared variable space to make the whole thing thread safe
 	
-    public static EvaluationResult evaluate(String expression, String sourceName, int lineNumber){
+    public static EvaluationResult evaluate(Context cx, Scriptable scope, String expression, String sourceName, int lineNumber){
     	String result = null;
     	try{
-    		Context cx = Context.enter();
-    		Scriptable scope = cx.initStandardObjects();
     		putVariablesInScope(cx, scope);
     		cx.evaluateString(scope, "console = {log: function(msg){Packages.nl.tue.spa.core.Environment.getConsoleController().log(msg);}}", "", 0, null);
     		cx.evaluateString(scope, "eventbus = {subscribe: function(party,variable){Packages.nl.tue.spa.core.Environment.getEventBus().subscribe(party,variable);},"
@@ -28,7 +26,6 @@ public class JavaProcessor {
     			result = Context.toString(returnedValue);
     		}
     		setVariablesFromScope(cx, scope);
-    		Context.exit();
     	}catch (Exception e){
     		return new EvaluationResult(e.getLocalizedMessage(), ResultType.ERROR);
     	}
@@ -39,8 +36,18 @@ public class JavaProcessor {
     	}
     }
     
-    public static EvaluationResult evaluateScript(String script, String sourceName){
-    	EvaluationResult er = evaluate(script, sourceName, 1);
+    public static Context initializeContext(){
+		Context cx = Context.enter();
+		return cx;
+    }
+    
+    public static Scriptable initializeScope(Context cx){
+		Scriptable scope = cx.initStandardObjects();
+    	return scope;
+    }
+    
+    public static EvaluationResult evaluateScript(Context cx, Scriptable scope, String script, String sourceName){
+    	EvaluationResult er = evaluate(cx, scope, script, sourceName, 1);
     	if (er.getType() == ResultType.ERROR){
     		return er;
     	}else{

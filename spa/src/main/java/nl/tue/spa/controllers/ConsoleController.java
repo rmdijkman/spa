@@ -6,6 +6,9 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+
 import nl.tue.spa.core.AppClipboard;
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
@@ -19,6 +22,9 @@ public class ConsoleController implements KeyListener, GUIStateSerializable {
 
 	ConsoleGUI gui;
 	
+	Context context;
+	Scriptable scope;
+	
 	int caretPosition;
 	
 	List<String> history = new ArrayList<String>();
@@ -29,6 +35,8 @@ public class ConsoleController implements KeyListener, GUIStateSerializable {
 		gui.printPrompt();
 		caretPosition = gui.getCaretPosition();
 		checkState();
+		context = JavaProcessor.initializeContext();
+		scope = JavaProcessor.initializeScope(context);
 	}
 	
 	public void processKey(int keyCode) {
@@ -104,7 +112,7 @@ public class ConsoleController implements KeyListener, GUIStateSerializable {
 	
 	public EvaluationResult evaluate(String command, String source, int lineNo){
 		gui.printEntry("\n");
-		EvaluationResult er = JavaProcessor.evaluate(command, source, lineNo);
+		EvaluationResult er = JavaProcessor.evaluate(context, scope, command, source, lineNo);
 		printResult(er);
 		Environment.getMainController().updateJavaScope();
 		return er;

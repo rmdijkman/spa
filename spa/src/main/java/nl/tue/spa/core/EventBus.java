@@ -42,7 +42,7 @@ public class EventBus {
 		if (partiesForVariable != null){
 			Set<String> partiesThatLeft = new HashSet<String>();
 			for (String party: partiesForVariable){
-				boolean received = Environment.getMainController().executeJavaScriptOnGraph(party, "update(\""+variable+"\","+value+")");
+				boolean received = Environment.getMainController().executeJavaScriptOnParty(party, "update(\""+variable+"\","+value+")");
 				if (!received){
 					partiesThatLeft.add(party);
 				}

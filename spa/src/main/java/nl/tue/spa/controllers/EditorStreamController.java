@@ -15,6 +15,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
 
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
@@ -31,10 +33,14 @@ public class EditorStreamController extends EditorController {
 	String fileToLoad;
 	String header[];
 	Iterator<CSVRecord> fileLoader;
+	Context context;
+	Scriptable scope;
 	
 	public EditorStreamController() {
 		this.gui = new EditorStreamGUI(this);
 		saved = false;
+		context = JavaProcessor.initializeContext();
+		scope = JavaProcessor.initializeScope(context);
 	}
 
 	public EditorStreamController(EditorGUIType type) {
@@ -59,7 +65,7 @@ public class EditorStreamController extends EditorController {
 				if (gui.hasHeaderRow() && fileLoader.hasNext()){
 					fileLoader.next();
 				}
-				JavaProcessor.evaluateScript(gui.getVariableName() + "=[]", "");
+				JavaProcessor.evaluateScript(context, scope, gui.getVariableName() + "=[]", "");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -70,7 +76,7 @@ public class EditorStreamController extends EditorController {
 			script = gui.getVariableName() + ".push(" + recordToString(fileLoader.next()) + ")";
 		}
 		MainController mc = Environment.getMainController();
-		EvaluationResult er = JavaProcessor.evaluateScript(script, "");
+		EvaluationResult er = JavaProcessor.evaluateScript(context, scope, script, "");
 		if (er.getType() == ResultType.ERROR){
 			mc.printEntry("\n");
 			mc.printResult(er);

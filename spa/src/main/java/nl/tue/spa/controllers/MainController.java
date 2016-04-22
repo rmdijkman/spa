@@ -8,6 +8,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
+
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.Main;
 import nl.tue.spa.core.guistate.GUIState;
@@ -113,17 +116,20 @@ public class MainController implements GUIStateSerializable{
 			bc.openWindow();
 		}
 		bc.loadContent(script);
-	}
+	}	
 	
-	
-	public boolean executeJavaScriptOnGraph(String fileName, String script){
+	public boolean executeJavaScriptOnParty(String fileName, String script){
 		BrowserController bc = graphWindows.get(fileName);
 		if (bc != null){
 			bc.executeJavaScript(script);
 			return true;
-		}else{
-			return false;
 		}
+		EditorTextController etc = Environment.getEditorContainerController().getEditorTextController(fileName);
+		if (etc != null){
+			etc.executeJavaScript(script);
+			return true;
+		}
+		return false;
 	}
 	
 	public void closeGraph(BrowserController gc){
@@ -178,7 +184,10 @@ public class MainController implements GUIStateSerializable{
 		if ((Boolean) state.getStateVar("VARIABLES_VISIBLE")){
 			openVariablesWindow();
 		}
-		JavaProcessor.evaluateScript((String) state.getStateVar("VARIABLE_VALUES"), "");
+		Context cx = JavaProcessor.initializeContext();
+		Scriptable scope = JavaProcessor.initializeScope(cx);
+		JavaProcessor.evaluateScript(cx, scope, (String) state.getStateVar("VARIABLE_VALUES"), "");
+		Context.exit();
 		updateJavaScope();
 		Environment.getEditorContainerController().restoreState((GUIState) state.getStateVar("EDITOR")); 
 		if ((Boolean) state.getStateVar("EDITOR_VISIBLE")){

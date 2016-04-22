@@ -1,6 +1,6 @@
 Add subscribe functionality:
-- add to scripts
-- create tester for scripts
+- if script does not have an update function, there should be a warning and it should be unsubscribed
+- if the script no longer exists, it should be unsubscribed
 - create tester for graphs
 Add threading functionality:
 - add to scripts
