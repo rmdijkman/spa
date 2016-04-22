@@ -86,18 +86,7 @@ public class EditorContainerGUI extends JInternalFrame{
 		btnRun.setFocusable(false);
 		btnRun.setIcon(new ImageIcon(EditorGUI.class.getResource("/nl/tue/spa/resources/icons/3 (24).png")));
 		toolBar.add(btnRun);
-		
-		JButton btnRunContinuous = new JButton("");
-		btnRunContinuous.setToolTipText("Run continuously");
-		btnRunContinuous.setFocusable(false);
-		btnRunContinuous.setIcon(new ImageIcon(EditorContainerGUI.class.getResource("/nl/tue/spa/resources/icons/3 (36).png")));
-		btnRunContinuous.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.executeScriptContinuously();
-			}
-		});
-		toolBar.add(btnRunContinuous);
-		
+				
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFocusable(false);
 		tabbedPane.addChangeListener(new ChangeListener() {

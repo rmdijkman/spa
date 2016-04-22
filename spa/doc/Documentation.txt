@@ -1,0 +1,11 @@
+There are some default functions that can be called from javascript:
+
+console.log(message)
+
+eventbus.subscribe(my name, variable name) - call to subscribe to changes in the value of a particular variable
+eventbus.unsubscribe(my name) - call to unsubscribe from any changes
+update(variable name, variable value) - if subscribing, must have a method like this to be notified of changes to variables
+
+runner.start(my name) - call to start executing in a thread 
+runner.stop(my name) - call to stop executing in a thread
+run() - if starting, must have a method like this that is executed repeatedly

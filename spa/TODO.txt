@@ -1,3 +1,16 @@
+Add subscribe functionality:
+- add to scripts
+- create tester for scripts
+- create tester for graphs
+Add threading functionality:
+- add to scripts
+- create tester for scripts
+- add to graphs
+- create tester for graphs
+- add to streams
+- create tester for streams
+Add active window functionality to display active pubsub/threads
+Create projects
 Enable invoking R from JavaScript
 Create visualization templates to more easily create visualizations of different types
 
@@ -16,9 +29,16 @@ MINOR FEATURES
 - Graph: enable showing errors from html panel (this proves much harder than it would seem)
 
 - VariablesWindow: put functions in a separate list, do not list the contents of the function
+- VariablesWindow: the external classes/functions (i.e. eventbus, console, runner) should not be stored in the variables
 
 - Properties: can return exception on load/save, handle that
 
 MAJOR FEATURES
+Additional component: library (this is basically a js or R file)
+Additional component: process visualization
+Additional component: visualization template
+Additional component: reduction (attaches directly to a stream, only events that pass reduction are kept, does not look inside event data)
+Additional component: transformation/filtering (this is also basically a js or R file, but with 'subscribe' or 'run' functionality, maybe do not distinguish them from libraries)
+Additional component: run configuration
 Replace internal frames with split panes
 Java objects cannot be used, because they cannot be serialized to JSON. Serialize them using Java Serializable instead.

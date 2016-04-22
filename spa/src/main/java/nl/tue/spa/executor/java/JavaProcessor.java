@@ -20,6 +20,9 @@ public class JavaProcessor {
     		Context cx = Context.enter();
     		Scriptable scope = cx.initStandardObjects();
     		putVariablesInScope(cx, scope);
+    		cx.evaluateString(scope, "console = {log: function(msg){Packages.nl.tue.spa.core.Environment.getConsoleController().log(msg);}}", "", 0, null);
+    		cx.evaluateString(scope, "eventbus = {subscribe: function(party,variable){Packages.nl.tue.spa.core.Environment.getEventBus().subscribe(party,variable);},"
+    				+ "unsubscribe: function(party){Packages.nl.tue.spa.core.Environment.getEventBus().unsubscribe(party);}}", "", 0, null);
     		Object returnedValue = cx.evaluateString(scope, expression, sourceName, lineNumber, null);
     		if (returnedValue != Context.getUndefinedValue()){
     			result = Context.toString(returnedValue);
