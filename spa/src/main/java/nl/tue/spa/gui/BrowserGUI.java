@@ -60,7 +60,7 @@ public class BrowserGUI extends JInternalFrame{
             	window.setMember("java", Environment.getConsoleController());
             	engine.executeScript("console.log = function(message){java.log(message);};");
                 engine.loadContent(content);
-            	window.setMember("eventBus", Environment.getEventBus());
+            	window.setMember("eventbus", Environment.getEventBus());
             }
         });
 	}

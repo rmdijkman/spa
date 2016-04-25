@@ -40,14 +40,9 @@ public class EventBus {
 	public void update(String variable, String value){
 		Set<String> partiesForVariable = subscriptions.get(variable);
 		if (partiesForVariable != null){
-			Set<String> partiesThatLeft = new HashSet<String>();
 			for (String party: partiesForVariable){
-				boolean received = Environment.getMainController().executeJavaScriptOnParty(party, "update(\""+variable+"\","+value+")");
-				if (!received){
-					partiesThatLeft.add(party);
-				}
+				Environment.getMainController().executeJavaScriptOnParty(party, "update(\""+variable+"\","+value+")");
 			}
-			partiesForVariable.removeAll(partiesThatLeft);
 		}		
 	}
 

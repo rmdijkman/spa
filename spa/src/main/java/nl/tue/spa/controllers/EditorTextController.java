@@ -175,9 +175,11 @@ public class EditorTextController extends EditorController implements KeyListene
 		}
 	}
 
-	public void executeJavaScript(String script) {
+	public EvaluationResult executeJavaScript(String script) {
 		MainController mc = Environment.getMainController();
-		JavaProcessor.evaluateScript(context, scope, script, "");
+		EvaluationResult result = JavaProcessor.evaluateScript(context, scope, script, "");
 		mc.updateJavaScope();
+		
+		return result;
 	}	
 }

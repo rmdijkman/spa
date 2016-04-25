@@ -2,26 +2,20 @@ package nl.tue.spa.core;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import nl.tue.spa.controllers.EditorController;
-
 public class Runner implements Runnable{
 
-	private static ConcurrentLinkedQueue<EditorController> executingPrograms;
+	private ConcurrentLinkedQueue<String> executingParties;
 	
-	private Runner(){
-		executingPrograms = new ConcurrentLinkedQueue<EditorController>(); 
+	public Runner(){
+		executingParties = new ConcurrentLinkedQueue<String>(); 
 	}
 	
 	@Override
 	public void run() {
 		while (true){			
 			try {				
-				for (EditorController ec: executingPrograms){
-					if (ec.isSaved()){
-						ec.runScript();
-					}else{
-						removeRunningController(ec);
-					}
+				for (String party: executingParties){
+					Environment.getMainController().executeJavaScriptOnParty(party, "run()");		
 				}				
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
@@ -30,32 +24,36 @@ public class Runner implements Runnable{
 		}
 	}
 	
-	public static void start(){
+	public void start(){
 		new Thread(new Runner()).start();
 	}
 	
-	public static void addRunningController(EditorController controller){
-		if (!executingPrograms.contains(controller)){
-			executingPrograms.add(controller);
-			Environment.getActiveController().addActive(controller.getFileName());
+	public void addRunningController(String fileName){
+		boolean controllerExists = false;
+		for (String ep: executingParties){
+			if (ep.equals(fileName)){
+				controllerExists = true;
+				break;
+			}
+		}
+
+		if (!controllerExists){
+			executingParties.add(fileName);
+			Environment.getActiveController().addActive(fileName);
 		}
 	}
 	
-	public static void removeRunningController(EditorController controller){
-		Environment.getActiveController().removeActive(controller.getFileName());
-		executingPrograms.remove(controller);		
-	}
-
-	public static void removeRunningController(String program) {
-		EditorController toRemove = null;
-		for (EditorController ec: executingPrograms){
-			if (ec.getFileName().equals(program)){
-				toRemove = ec;
+	public void removeRunningController(String fileName) {
+		String toRemove = null;
+		for (String ep: executingParties){
+			if (ep.equals(fileName)){
+				toRemove = ep;
 				break;
 			}
 		}
 		if (toRemove != null){
-			removeRunningController(toRemove);
+			executingParties.remove(fileName);		
+			Environment.getActiveController().removeActive(fileName);
 		}
 	}
 }

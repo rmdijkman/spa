@@ -2,7 +2,6 @@ console.log(new java.util.Date());
 
 eventbus.subscribe("pubsub.js","a");
 
-function update(varname, varval){
-	console.log(varval);
-	console.log("adas");
+function update(vari, valu){
+	console.log(valu);
 }

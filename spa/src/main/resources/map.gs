@@ -21,7 +21,7 @@
         }
         map = new google.maps.Map(mapCanvas, mapOptions);
         title2Marker = {};
-        eventBus.subscribe("map.gs","marker");
+        eventbus.subscribe("map.gs","marker");
         console.log("log");
       }
 

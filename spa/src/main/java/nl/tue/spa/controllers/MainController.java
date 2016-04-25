@@ -16,6 +16,7 @@ import nl.tue.spa.core.Main;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.core.guistate.GUIStateSerializable;
 import nl.tue.spa.executor.EvaluationResult;
+import nl.tue.spa.executor.EvaluationResult.ResultType;
 import nl.tue.spa.executor.java.JavaProcessor;
 import nl.tue.spa.gui.MainGUI;
 
@@ -118,18 +119,20 @@ public class MainController implements GUIStateSerializable{
 		bc.loadContent(script);
 	}	
 	
-	public boolean executeJavaScriptOnParty(String fileName, String script){
+	public void executeJavaScriptOnParty(String fileName, String script){
 		BrowserController bc = graphWindows.get(fileName);
 		if (bc != null){
 			bc.executeJavaScript(script);
-			return true;
 		}
 		EditorTextController etc = Environment.getEditorContainerController().getEditorTextController(fileName);
 		if (etc != null){
-			etc.executeJavaScript(script);
-			return true;
+			EvaluationResult result = etc.executeJavaScript(script);
+			if (result.getType() == ResultType.ERROR){
+        		Environment.getEventBus().unsubscribe(fileName);
+        		Environment.getRunner().removeRunningController(fileName);
+        		Environment.getMainController().showMessageDialog(fileName + " has subscribed to events, but an error occurred. Removed it from the list of active parties. Specific error: " + result.getResult(), "Update error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
-		return false;
 	}
 	
 	public void closeGraph(BrowserController gc){

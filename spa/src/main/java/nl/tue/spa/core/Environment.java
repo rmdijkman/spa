@@ -19,6 +19,14 @@ public class Environment {
 	private static EditorContainerController editorContoller;
 	private static EventBus eventBus;
 	private static Properties properties;
+	private static Runner runner;
+	
+	public static Runner getRunner(){
+		if (runner == null){
+			runner = new Runner();
+		}
+		return runner;
+	}
 	
 	public static RProcessor getRProcessor(){
 		if (rProcessor == null){

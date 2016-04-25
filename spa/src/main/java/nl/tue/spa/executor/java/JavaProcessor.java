@@ -21,6 +21,8 @@ public class JavaProcessor {
     		cx.evaluateString(scope, "console = {log: function(msg){Packages.nl.tue.spa.core.Environment.getConsoleController().log(msg);}}", "", 0, null);
     		cx.evaluateString(scope, "eventbus = {subscribe: function(party,variable){Packages.nl.tue.spa.core.Environment.getEventBus().subscribe(party,variable);},"
     				+ "unsubscribe: function(party){Packages.nl.tue.spa.core.Environment.getEventBus().unsubscribe(party);}}", "", 0, null);
+    		cx.evaluateString(scope,  "runner = {start: function(party){Packages.nl.tue.core.Runner.addRunningController(party);},"
+    				+ "stop: function(party){Packages.nl.tue.core.Runner.removeRunningController(party);}}", "", 0, null);
     		Object returnedValue = cx.evaluateString(scope, expression, sourceName, lineNumber, null);
     		if (returnedValue != Context.getUndefinedValue()){
     			result = Context.toString(returnedValue);
@@ -89,16 +91,18 @@ public class JavaProcessor {
     	Object variableNames[] = scope.getIds();
     	for (int i = variableNames.length-1; i >= 0; i--){
     		String variable = variableNames[i].toString();
-    		String jsonValue = "";
-    		if (Context.toString(cx.evaluateString(scope, "typeof(" + variable.toString() +")", "", 1, null)).equals("function")){
-    			jsonValue = Context.toString(cx.evaluateString(scope, variable.toString() +".toString()", "", 1, null));    			
-    		}else{
-    			jsonValue = Context.toString(cx.evaluateString(scope, "JSON.stringify(" + variable.toString() +")", "", 1, null));
-    			if (!jsonValue.equals(variables.get(variable))){ //If it is changed, put the variable/value on the event bus.
-    				Environment.getEventBus().update(variable, jsonValue);
+    		if (!variable.equals("eventbus") && !variable.equals("runner") && !variable.equals("console") && !variable.equals("update")){
+    			String jsonValue = "";
+    			if (Context.toString(cx.evaluateString(scope, "typeof(" + variable.toString() +")", "", 1, null)).equals("function")){
+    				jsonValue = Context.toString(cx.evaluateString(scope, variable.toString() +".toString()", "", 1, null));    			
+    			}else{
+    				jsonValue = Context.toString(cx.evaluateString(scope, "JSON.stringify(" + variable.toString() +")", "", 1, null));
+    				if (!jsonValue.equals(variables.get(variable))){ //If it is changed, put the variable/value on the event bus.
+    					Environment.getEventBus().update(variable, jsonValue);
+    				}
     			}
+    			variables.put(variable, jsonValue);
     		}
-    		variables.put(variable, jsonValue);
     	}
     }
 

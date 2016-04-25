@@ -83,7 +83,7 @@ public class Main {
 			        }
 					Environment.getMainController().makeVisible();
 					restoreState();
-					Runner.start();
+					Environment.getRunner().start();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

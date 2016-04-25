@@ -136,14 +136,14 @@ public class EditorContainerController implements GUIStateSerializable{
 		String fileName = ec.getFileName();
 		if (fileName != null){
 			gui.setEditorTitle(ec, fileName);
-			Runner.addRunningController(ec);
+			Environment.getRunner().addRunningController(fileName);
 		}		
 	}
 
 	public void stopScript() {
 		EditorController ec = gui.getSelectedEditor();
 		if (ec == null) return;
-		Runner.removeRunningController(ec);
+		Environment.getRunner().removeRunningController(ec.getFileName());
 	}
 
 	public void newStreamFile() {
