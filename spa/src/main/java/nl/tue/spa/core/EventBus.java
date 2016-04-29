@@ -5,6 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+
+import nl.tue.spa.gui.ActiveGUI.ActiveType;
+
 public class EventBus {
 
 	private Map<String, Set<String>> subscriptions; //variable name, set of parties subscribed to changes to the variable 
@@ -22,11 +26,16 @@ public class EventBus {
 	 * @param variable name of the JavaScript variable to notify changes of.
 	 */
 	public void subscribe(String party, String variable){
+		if (Environment.getActiveController().isActive(party)){
+			Environment.getMainController().showMessageDialog(party + " is already active. Stop it before activating it again.", "Activation error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		Set<String> partiesForVariable = subscriptions.get(variable);
 		if (partiesForVariable == null){
 			partiesForVariable = new HashSet<String>();
 		}
 		partiesForVariable.add(party);
+		Environment.getActiveController().addActive(party, ActiveType.TYPE_PUBSUB);
 		subscriptions.put(variable, partiesForVariable);
 	}
 	
@@ -41,7 +50,7 @@ public class EventBus {
 		Set<String> partiesForVariable = subscriptions.get(variable);
 		if (partiesForVariable != null){
 			for (String party: partiesForVariable){
-				Environment.getMainController().executeJavaScriptOnParty(party, "update(\""+variable+"\","+value+")");
+				Environment.getMainController().executeScriptOnParty(party, "update(\""+variable+"\","+value+")");
 			}
 		}		
 	}
@@ -54,6 +63,7 @@ public class EventBus {
 	public void unsubscribe(String party) {
 		for (Set<String> me: subscriptions.values()){
 			me.remove(party);
+			Environment.getActiveController().removeActive(party);
 		}
 	}
 }

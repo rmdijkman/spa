@@ -80,7 +80,7 @@ public class EditorContainerGUI extends JInternalFrame{
 		btnRun.setToolTipText("Run once");
 		btnRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				controller.executeScript();
+				controller.runScript();
 			}
 		});
 		btnRun.setFocusable(false);

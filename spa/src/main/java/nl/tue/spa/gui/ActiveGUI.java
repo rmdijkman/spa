@@ -26,7 +26,18 @@ import java.awt.event.ActionListener;
 public class ActiveGUI extends JInternalFrame implements ListSelectionListener{
 	private static final long serialVersionUID = 1L;
 	
-	private static String columnNames[] = {"active"};
+	public enum ActiveType {
+		TYPE_THREAD ("thread"), TYPE_PUBSUB ("subscribed");
+		private String name;
+		ActiveType(String name){
+			this.name = name;
+		}
+		public String getName(){
+			return name;
+		}
+	};
+	
+	private static String columnNames[] = {"component","type"};
 	
 	private ActiveController controller;
 	private JTable table;
@@ -80,24 +91,33 @@ public class ActiveGUI extends JInternalFrame implements ListSelectionListener{
 		getContentPane().add(scrollPane, BorderLayout.CENTER);
 	}
 	
-	public void addActive(String program) {
+	public void addActive(String program, ActiveType at) {
+		if (getActive(program) != -1){
+			return;
+		}
 		DefaultTableModel model = (DefaultTableModel) table.getModel();
-		model.addRow(new Object[]{program});		
+		model.addRow(new Object[]{program, at.getName()});		
 	}
 
-	public void removeActive(String program) {
+	public void removeActive(String program){
 		DefaultTableModel model = (DefaultTableModel) table.getModel();
-		int rowToRemove = -1;
-		for (int i = 0; i < table.getRowCount(); i++){
-			if (model.getValueAt(i, 0).toString().equals(program)){
-				rowToRemove = i;
-				break;
-			}
-		}
+		int rowToRemove = getActive(program);
 		if (rowToRemove != -1){
 			model.removeRow(rowToRemove);
 		}
-	}	
+	}
+	
+	public int getActive(String program){
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		int rowOfActive = -1;
+		for (int i = 0; i < table.getRowCount(); i++){
+			if (model.getValueAt(i, 0).toString().equals(program)){
+				rowOfActive = i;
+				break;
+			}
+		}
+		return rowOfActive;
+	}
 	
 	class ActiveTableModel extends DefaultTableModel {
 		private static final long serialVersionUID = 1L;

@@ -118,19 +118,43 @@ public class MainController implements GUIStateSerializable{
 		}
 		bc.loadContent(script);
 	}	
+
+	/**
+	 * Runs the entire script of the party that is identified by the given filename.
+	 * The party has to be a scripting party, not a graph.
+	 * 
+	 * @param fileName the filename of the party to run the script on.
+	 */
+	public void executeScriptOnParty(String fileName){
+		EditorController etc = Environment.getEditorContainerController().getEditorController(fileName);
+		if (etc != null){
+			etc.executeScript();
+		}
+	}
 	
-	public void executeJavaScriptOnParty(String fileName, String script){
+	/**
+	 * Runs the given script on the party that is identified by the given filename.
+	 * The party can both be a scripting party and a graph.
+	 * The party's context must be initialized.
+	 * If the execution fails, the party is removed from the list of running threads and 
+	 * any subscriptions and an error is produced on screen. 
+	 * 
+	 * @param fileName the filename of the party to run the script on.
+	 * @param script the script to run.
+	 */
+	public void executeScriptOnParty(String fileName, String script){
 		BrowserController bc = graphWindows.get(fileName);
 		if (bc != null){
-			bc.executeJavaScript(script);
+			bc.executeScript(script);
+			return;
 		}
-		EditorTextController etc = Environment.getEditorContainerController().getEditorTextController(fileName);
+		EditorController etc = Environment.getEditorContainerController().getEditorController(fileName);
 		if (etc != null){
-			EvaluationResult result = etc.executeJavaScript(script);
+			EvaluationResult result = etc.executeScript(script);
 			if (result.getType() == ResultType.ERROR){
         		Environment.getEventBus().unsubscribe(fileName);
         		Environment.getRunner().removeRunningController(fileName);
-        		Environment.getMainController().showMessageDialog(fileName + " has subscribed to events, but an error occurred. Removed it from the list of active parties. Specific error: " + result.getResult(), "Update error", JOptionPane.ERROR_MESSAGE);
+        		Environment.getMainController().showMessageDialog(fileName + " is active, but an error occurred. Removed it from the list of active parties. Specific error: " + result.getResult(), "Update error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

@@ -38,7 +38,7 @@ public class BrowserController {
 		return gui.isVisible();
 	}
 	
-	public void executeJavaScript(String script){
+	public void executeScript(String script){
 		gui.executeJavaScript(script);
 	}
 }

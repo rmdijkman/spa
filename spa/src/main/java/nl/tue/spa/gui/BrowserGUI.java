@@ -56,11 +56,16 @@ public class BrowserGUI extends JInternalFrame{
                 WebView view = new WebView();
                 engine = view.getEngine();
                 jfxPanel.setScene(new Scene(view));
-            	JSObject window = (JSObject) engine.executeScript("window");
-            	window.setMember("java", Environment.getConsoleController());
-            	engine.executeScript("console.log = function(message){java.log(message);};");
-                engine.loadContent(content);
+            	
+                JSObject window = (JSObject) engine.executeScript("window");
+            	window.setMember("consolecontroller", Environment.getConsoleController());
+            	window.setMember("runnercore", Environment.getRunner());
+            	engine.executeScript("console.log = function(message){consolecontroller.log(message);};");
+            	engine.executeScript("runner = {start: function(party){runnercore.addRunningController(party);},"+
+            									"stop: function(party){runnercore.removeRunningController(party);}};");
             	window.setMember("eventbus", Environment.getEventBus());
+                
+            	engine.loadContent(content);            	
             }
         });
 	}
@@ -73,7 +78,8 @@ public class BrowserGUI extends JInternalFrame{
             		engine.executeScript(script);
             	}catch (Exception e){
             		Environment.getEventBus().unsubscribe(controller.getFileName());
-            		Environment.getMainController().showMessageDialog(controller.getFileName() + " has subscribed to events, but an error occurred. Maybe it does not have a function update(<variable name>,<value>). Removed it from the subscription. Specific error: " + e.getMessage(), "Update error", JOptionPane.ERROR_MESSAGE);
+            		Environment.getRunner().removeRunningController(controller.getFileName());            		
+            		Environment.getMainController().showMessageDialog(controller.getFileName() + " is active, but an error occurred. Removed it from the list of active parties. Specific error: " + e.getMessage(), "Update error", JOptionPane.ERROR_MESSAGE);
             	}
             }
         });		

@@ -1,23 +1,36 @@
 package nl.tue.spa.core;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.swing.JOptionPane;
+
+import nl.tue.spa.gui.ActiveGUI.ActiveType;
 
 public class Runner implements Runnable{
 
-	private ConcurrentLinkedQueue<String> executingParties;
+	private static ConcurrentLinkedQueue<String> executingParties;
+	private static ConcurrentLinkedQueue<String> onceExecutingParties;
 	
 	public Runner(){
-		executingParties = new ConcurrentLinkedQueue<String>(); 
+		executingParties = new ConcurrentLinkedQueue<String>();
+		onceExecutingParties = new ConcurrentLinkedQueue<String>();
 	}
 	
 	@Override
 	public void run() {
 		while (true){			
-			try {				
+			try {
+				ArrayList<String> executed = new ArrayList<String>();
+				for (String party: onceExecutingParties){
+					Environment.getMainController().executeScriptOnParty(party);
+					executed.add(party);
+				}
+				onceExecutingParties.removeAll(executed);
 				for (String party: executingParties){
-					Environment.getMainController().executeJavaScriptOnParty(party, "run()");		
+					Environment.getMainController().executeScriptOnParty(party, "run()");
 				}				
-				Thread.sleep(2000);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -29,6 +42,11 @@ public class Runner implements Runnable{
 	}
 	
 	public void addRunningController(String fileName){
+		if (Environment.getActiveController().isActive(fileName)){
+			Environment.getMainController().showMessageDialog(fileName + " is already active. Stop it before activating it again.", "Activation error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
 		boolean controllerExists = false;
 		for (String ep: executingParties){
 			if (ep.equals(fileName)){
@@ -39,8 +57,12 @@ public class Runner implements Runnable{
 
 		if (!controllerExists){
 			executingParties.add(fileName);
-			Environment.getActiveController().addActive(fileName);
+			Environment.getActiveController().addActive(fileName, ActiveType.TYPE_THREAD);
 		}
+	}
+	
+	public void addOnceRunningController(String fileName){
+		onceExecutingParties.add(fileName);
 	}
 	
 	public void removeRunningController(String fileName) {

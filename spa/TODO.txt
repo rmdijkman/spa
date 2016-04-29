@@ -1,11 +1,3 @@
-Add threading functionality:
-- add to scripts
-- create tester for scripts
-- add to graphs
-- create tester for graphs
-- add to streams
-- create tester for streams
-Add active window functionality to display active pubsub/threads
 Create projects
 Enable invoking R from JavaScript
 Create visualization templates to more easily create visualizations of different types

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import nl.tue.spa.core.Environment;
-import nl.tue.spa.core.Runner;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.core.guistate.GUIStateSerializable;
 import nl.tue.spa.gui.EditorContainerGUI;
@@ -43,10 +42,10 @@ public class EditorContainerController implements GUIStateSerializable{
 		return true;
 	}
 	
-	public EditorTextController getEditorTextController(String fileName){
+	public EditorController getEditorController(String fileName){
 		for (EditorController ec: editorWindows){
-			if ((ec instanceof EditorTextController) && (ec.getFileName().equals(fileName))){
-				return (EditorTextController) ec;
+			if (ec.getFileName().equals(fileName)){
+				return ec;
 			}
 		}
 		return null;
@@ -73,7 +72,7 @@ public class EditorContainerController implements GUIStateSerializable{
 		}
 	}
 
-	public void executeScript() {
+	public void runScript() {
 		EditorController ec = gui.getSelectedEditor();
 		if (ec == null) return;
 		ec.runScript();
@@ -126,17 +125,6 @@ public class EditorContainerController implements GUIStateSerializable{
 				editorWindows.add(ec);
 				gui.addEditor(ec.getFileName(), ec);
 			}
-		}		
-	}
-
-	public void executeScriptContinuously() {
-		EditorController ec = gui.getSelectedEditor();
-		if (ec == null) return;
-		ec.runScript();
-		String fileName = ec.getFileName();
-		if (fileName != null){
-			gui.setEditorTitle(ec, fileName);
-			Environment.getRunner().addRunningController(fileName);
 		}		
 	}
 

@@ -138,10 +138,10 @@ public class ConsoleGUI extends JInternalFrame implements RConsole{
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
 
-        int len = textPane.getDocument().getLength();
-        textPane.setCaretPosition(len);
+        textPane.setCaretPosition(textPane.getDocument().getLength());
         textPane.setCharacterAttributes(aset, false);
         textPane.replaceSelection(msg);
+        textPane.setCaretPosition(textPane.getDocument().getLength());
     }
 
 	public void removeText(int caretPosition, int length) {

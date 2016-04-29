@@ -3,7 +3,6 @@ package nl.tue.spa.controllers;
 import java.awt.Rectangle;
 
 import nl.tue.spa.core.Environment;
-import nl.tue.spa.core.Runner;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.core.guistate.GUIStateSerializable;
 import nl.tue.spa.gui.ActiveGUI;
@@ -37,9 +36,13 @@ public class ActiveController implements GUIStateSerializable{
 	public void restoreState(GUIState state) {
 		gui.setBounds((Rectangle) state.getStateVar("BOUNDS"));
 	}
+	
+	public boolean isActive(String program){
+		return gui.getActive(program) != -1;
+	}
 
-	public void addActive(String program) {
-		gui.addActive(program);
+	public void addActive(String program, ActiveGUI.ActiveType activeType) {
+		gui.addActive(program, activeType);
 	}
 
 	public void removeActive(String program) {
@@ -48,6 +51,7 @@ public class ActiveController implements GUIStateSerializable{
 	
 	public void stopActive(String program) {
 		Environment.getRunner().removeRunningController(program);
+		Environment.getEventBus().unsubscribe(program);
 	}
 
 	public void selectionChanged() {

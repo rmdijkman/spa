@@ -14,6 +14,8 @@ public class JavaProcessor {
 
 	private static Map<String,String> variables = new HashMap<String,String>(); //Shared variable space to make the whole thing thread safe
 	
+	private static final String[] reservedVariableNames = {"eventbus","runner","console","update","run"}; 
+	
     public static EvaluationResult evaluate(Context cx, Scriptable scope, String expression, String sourceName, int lineNumber){
     	String result = null;
     	try{
@@ -21,8 +23,8 @@ public class JavaProcessor {
     		cx.evaluateString(scope, "console = {log: function(msg){Packages.nl.tue.spa.core.Environment.getConsoleController().log(msg);}}", "", 0, null);
     		cx.evaluateString(scope, "eventbus = {subscribe: function(party,variable){Packages.nl.tue.spa.core.Environment.getEventBus().subscribe(party,variable);},"
     				+ "unsubscribe: function(party){Packages.nl.tue.spa.core.Environment.getEventBus().unsubscribe(party);}}", "", 0, null);
-    		cx.evaluateString(scope,  "runner = {start: function(party){Packages.nl.tue.core.Runner.addRunningController(party);},"
-    				+ "stop: function(party){Packages.nl.tue.core.Runner.removeRunningController(party);}}", "", 0, null);
+    		cx.evaluateString(scope,  "runner = {start: function(party){Packages.nl.tue.spa.core.Environment.getRunner().addRunningController(party);},"
+    				+ "stop: function(party){Packages.nl.tue.spa.core.Environment.getRunner().removeRunningController(party);}}", "", 0, null);
     		Object returnedValue = cx.evaluateString(scope, expression, sourceName, lineNumber, null);
     		if (returnedValue != Context.getUndefinedValue()){
     			result = Context.toString(returnedValue);
@@ -91,7 +93,7 @@ public class JavaProcessor {
     	Object variableNames[] = scope.getIds();
     	for (int i = variableNames.length-1; i >= 0; i--){
     		String variable = variableNames[i].toString();
-    		if (!variable.equals("eventbus") && !variable.equals("runner") && !variable.equals("console") && !variable.equals("update")){
+    		if (!isReserved(variable)){
     			String jsonValue = "";
     			if (Context.toString(cx.evaluateString(scope, "typeof(" + variable.toString() +")", "", 1, null)).equals("function")){
     				jsonValue = Context.toString(cx.evaluateString(scope, variable.toString() +".toString()", "", 1, null));    			
@@ -134,5 +136,14 @@ public class JavaProcessor {
 	 */
 	public static synchronized void removeVariable(String variableName) {
 		variables.remove(variableName);
-	}	
+	}
+	
+	private static boolean isReserved(String variableName){
+		for (String reservedVariableName: reservedVariableNames){
+			if (reservedVariableName.equals(variableName)){
+				return true;
+			}
+		}
+		return false;
+	}
 }

@@ -32,8 +32,6 @@ public class EditorTextController extends EditorController implements KeyListene
 	public EditorTextController() {
 		this.gui = new EditorTextGUI(this);
 		saved = false;
-		context = JavaProcessor.initializeContext();
-		scope = JavaProcessor.initializeScope(context);
 	}
 
 	public EditorTextController(EditorGUIType type) {
@@ -41,36 +39,23 @@ public class EditorTextController extends EditorController implements KeyListene
 		this.type = type;
 	}
 	
-	public void runJavaScript() {
-		MainController mc = Environment.getMainController();
-		EvaluationResult er = JavaProcessor.evaluateScript(context, scope, gui.getScript(), "");
-		if (er.getType() != ResultType.UNDEFINED){
-			mc.printEntry("\n");
-			mc.printResult(er);
-		}
-		mc.updateJavaScope();
-	}
-
-	public void runGraphScript() {
-		String script = gui.getScript();
-		String variables = "<script>\n" + JavaProcessor.getVariablesAsScript() + "</script>\n";
-		int headIndex = script.indexOf("<head>");
-		if (headIndex != -1){
-			script = script.substring(0, headIndex + 6) + variables + script.substring(headIndex + 6);
-		}else{
-			int bodyIndex = script.indexOf("<body>");
-			if (bodyIndex != -1){
-				script = script.substring(0, bodyIndex + 6) + variables + script.substring(bodyIndex + 6);
-			}else{
-				JOptionPane.showMessageDialog(gui, "Cannot create graph, because your graph script does not contain a head or a body tag.", "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-		Environment.getMainController().newOrUpdatedGraph(fileName, script);
-	}
-	
+	/**
+	 * Runs the script that belongs to this controller.
+	 * This method should typically called from the user interface.
+	 * It primarily handles user interaction related to running the script.
+	 * It delegates the actual execution to 'execute' methods.
+	 * 
+	 * If the script is not saved, asks to save the script. 
+	 * If the user does not save the script, aborts.
+	 * If the script is already running, presents a warning to the user and aborts.
+	 */
 	public void runScript(){
-		super.runScript();
+		askToSaveBeforeExecution();
 		if (saved){
+			if (Environment.getActiveController().isActive(fileName)){
+				Environment.getMainController().showMessageDialog(fileName + " is already active. Stop it before activating it again.", "Activation error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			switch (type){
 			case TYPE_JAVA_SCRIPT:
 				runJavaScript();
@@ -87,7 +72,28 @@ public class EditorTextController extends EditorController implements KeyListene
 		}
 	}
 	
-	public void runRScript() {
+	private void runJavaScript() {
+		Environment.getRunner().addOnceRunningController(fileName);
+	}
+
+	private void runGraphScript() {
+		String script = gui.getScript();
+		String variables = "<script>\n" + JavaProcessor.getVariablesAsScript() + "</script>\n";
+		int headIndex = script.indexOf("<head>");
+		if (headIndex != -1){
+			script = script.substring(0, headIndex + 6) + variables + script.substring(headIndex + 6);
+		}else{
+			int bodyIndex = script.indexOf("<body>");
+			if (bodyIndex != -1){
+				script = script.substring(0, bodyIndex + 6) + variables + script.substring(bodyIndex + 6);
+			}else{
+				JOptionPane.showMessageDialog(gui, "Cannot create graph, because your graph script does not contain a head or a body tag.", "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+		Environment.getMainController().newOrUpdatedGraph(fileName, script);
+	}
+		
+	private void runRScript() {
 	}
 
 	@Override
@@ -175,11 +181,39 @@ public class EditorTextController extends EditorController implements KeyListene
 		}
 	}
 
-	public EvaluationResult executeJavaScript(String script) {
+	/**
+	 * Executes the given script on the existing context of the script.
+	 * Requires that this controller represents a JavaScript.
+	 * Requires that a context belonging to this controller already exists.
+	 * (This context is produced by calling executeJavaScript().)
+	 *  
+	 * @param script The script to execute. Must be JavaScript.
+	 * @return The result of the evaluation of the script
+	 */
+	public EvaluationResult executeScript(String script) {
 		MainController mc = Environment.getMainController();
 		EvaluationResult result = JavaProcessor.evaluateScript(context, scope, script, "");
 		mc.updateJavaScope();
 		
 		return result;
-	}	
+	}
+	/**
+	 * Executes the entire script that belongs to this controller.
+	 * Requires that this controller represents a JavaScript.
+	 * Creates a context for the script that belongs to this controller.
+	 * 
+	 * @return The result of the evaluation of the script that belongs to this controller
+	 */
+	public EvaluationResult executeScript(){
+		MainController mc = Environment.getMainController();
+		context = JavaProcessor.initializeContext();
+		scope = JavaProcessor.initializeScope(context);
+		EvaluationResult er = JavaProcessor.evaluateScript(context, scope, gui.getScript(), "");
+		if (er.getType() != ResultType.UNDEFINED){
+			mc.printEntry("\n");
+			mc.printResult(er);
+		}
+		mc.updateJavaScope();
+		return er;
+	}
 }

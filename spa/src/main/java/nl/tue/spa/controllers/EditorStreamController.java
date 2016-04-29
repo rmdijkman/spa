@@ -39,8 +39,6 @@ public class EditorStreamController extends EditorController {
 	public EditorStreamController() {
 		this.gui = new EditorStreamGUI(this);
 		saved = false;
-		context = JavaProcessor.initializeContext();
-		scope = JavaProcessor.initializeScope(context);
 	}
 
 	public EditorStreamController(EditorGUIType type) {
@@ -49,39 +47,14 @@ public class EditorStreamController extends EditorController {
 	}
 	
 	public void runScript(){
-		super.runScript();
-		if (!saved) return;
-		if (gui.getVariableName().length() == 0) return;
-		
-		if (fileLoader == null){
-			try {
-				File f = new File(fileToLoad);
-				loadHeaderFromCSV(f);
-				CSVFormat csvFormat = gui.getSelectedCSVFormat();
-				csvFormat = csvFormat.withDelimiter(gui.getDelimiter());
-				CSVParser parser;
-				parser = CSVParser.parse(f, Charset.defaultCharset(), csvFormat);
-				fileLoader = parser.iterator();
-				if (gui.hasHeaderRow() && fileLoader.hasNext()){
-					fileLoader.next();
-				}
-				JavaProcessor.evaluateScript(context, scope, gui.getVariableName() + "=[]", "");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		askToSaveBeforeExecution();
+		if (saved){
+			if (Environment.getActiveController().isActive(fileName)){
+				Environment.getMainController().showMessageDialog(fileName + " is already active. Stop it before activating it again.", "Activation error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}		
+			Environment.getRunner().addRunningController(fileName);
 		}
-		
-		String script = "";
-		if (fileLoader.hasNext()){
-			script = gui.getVariableName() + ".push(" + recordToString(fileLoader.next()) + ")";
-		}
-		MainController mc = Environment.getMainController();
-		EvaluationResult er = JavaProcessor.evaluateScript(context, scope, script, "");
-		if (er.getType() == ResultType.ERROR){
-			mc.printEntry("\n");
-			mc.printResult(er);
-		}
-		mc.updateJavaScope();
 	}
 	
 	private String recordToString(CSVRecord record){
@@ -286,4 +259,42 @@ public class EditorStreamController extends EditorController {
 			Environment.getEditorContainerController().updateSavedState();
 		}
 	}
+	
+	public EvaluationResult executeScript(){
+		if (!saved) return new EvaluationResult("The stream is not saved. It must be saved to be executed.", ResultType.ERROR);
+		if (gui.getVariableName().length() == 0) return new EvaluationResult("The stream does not have a variable name. It must have a variable name to be executed.", ResultType.ERROR);
+		
+		if (fileLoader == null){
+			try {
+				File f = new File(fileToLoad);
+				loadHeaderFromCSV(f);
+				CSVFormat csvFormat = gui.getSelectedCSVFormat();
+				csvFormat = csvFormat.withDelimiter(gui.getDelimiter());
+				CSVParser parser;
+				parser = CSVParser.parse(f, Charset.defaultCharset(), csvFormat);
+				fileLoader = parser.iterator();
+				if (gui.hasHeaderRow() && fileLoader.hasNext()){
+					fileLoader.next();
+				}
+				context = JavaProcessor.initializeContext();
+				scope = JavaProcessor.initializeScope(context);
+				JavaProcessor.evaluateScript(context, scope, gui.getVariableName() + "=[]", "");
+			} catch (IOException e) {
+				return new EvaluationResult("An error occurred while loading the stream. Specific error: " + e.getMessage(), ResultType.ERROR);
+			}
+		}
+		
+		String script = "";
+		if (fileLoader.hasNext()){
+			script = gui.getVariableName() + ".push(" + recordToString(fileLoader.next()) + ")";
+		}
+		MainController mc = Environment.getMainController();
+		EvaluationResult er = JavaProcessor.evaluateScript(context, scope, script, "");
+		mc.updateJavaScope();
+		return er;
+	}
+	
+	public EvaluationResult executeScript(String script){
+		return executeScript();
+	}	
 }

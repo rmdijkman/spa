@@ -9,6 +9,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.core.guistate.GUIStateSerializable;
+import nl.tue.spa.executor.EvaluationResult;
 import nl.tue.spa.gui.EditorTextGUI;
 import nl.tue.spa.gui.EditorGUI;
 import nl.tue.spa.gui.EditorGUI.EditorGUIType;
@@ -143,7 +144,11 @@ public abstract class EditorController implements GUIStateSerializable {
 		}
 	}
 	
-	public void runScript(){
+	/**
+	 * If the script that belongs to this controller is not saved, asks the user to save the script.
+	 * If the user wants to save, opens the save dialog and handles saving.
+	 */
+	public void askToSaveBeforeExecution(){
 		if (!saved){
 			int answer = Environment.getMainController().showDialog("Your script must be saved before it can be executed. Do you want to save now?", "Notification", JOptionPane.YES_NO_OPTION);
 			if (answer != JOptionPane.YES_OPTION){
@@ -156,4 +161,10 @@ public abstract class EditorController implements GUIStateSerializable {
 	public abstract boolean save(boolean saveAs);
 
 	public abstract EditorGUI getGUI();
+	
+	public abstract void runScript();
+	
+	public abstract EvaluationResult executeScript(String script);
+
+	public abstract EvaluationResult executeScript();
 }
