@@ -34,6 +34,7 @@ public class EditorStreamController extends EditorController {
 				Environment.getMainController().showMessageDialog(fileName + " is already active. Stop it before activating it again.", "Activation error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}		
+			Environment.getRunner().addPartyToRun(file);
 			Environment.getRunner().addPartyToThread(fileName);
 		}
 	}
@@ -125,12 +126,15 @@ public class EditorStreamController extends EditorController {
 	}
 
 	public void refreshFile() {
-		if (fileToLoad != null){
-			File f = new File(fileToLoad);
-			loadHeaderFromCSV(f);
-			gui.setHeader(header);
-			gui.setData(loadFirstLinesFromCSV(f));
-			fileLoader = null;
-		}
-}
+		StreamScript script = new StreamScript(file);
+		script.setFileToLoad(gui.getSelectedFile());
+		script.setCSVFormat(gui.getSelectedCSVFormat());
+		script.setDelimiter(gui.getDelimiter());
+		script.setHasHeaderRow(gui.hasHeaderRow());
+		script.setVariableName(gui.getVariableName());
+		
+		script.loadCSV();
+		gui.setHeader(script.getHeader());
+		gui.setData(script.loadFirstLinesFromCSV());
+	}
 }

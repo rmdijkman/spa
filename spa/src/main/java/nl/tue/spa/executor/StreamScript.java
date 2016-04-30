@@ -140,10 +140,10 @@ public class StreamScript extends Script{
 		loadHeaderFromCSV(f);
 	}
 		
-	public String[][] loadFirstLinesFromCSV(File f){
+	public String[][] loadFirstLinesFromCSV(){
 		String[][] result = null;
 		try {
-			CSVParser parser = CSVParser.parse(f, Charset.defaultCharset(), csvFormat);
+			CSVParser parser = CSVParser.parse(new File(fileToLoad), Charset.defaultCharset(), csvFormat);
 
 			Iterator<CSVRecord> i = parser.iterator();
 			if (!i.hasNext()){
@@ -208,8 +208,7 @@ public class StreamScript extends Script{
 
 	@Override
 	public EvaluationResult execute(String line) {
-		// TODO Auto-generated method stub
-		return null;
+		return execute();
 	}
 	
 	public String getFileToLoad() {
@@ -251,5 +250,9 @@ public class StreamScript extends Script{
 
 	public void setVariableName(String variableName) {
 		this.variableName = variableName;
+	}
+
+	public String[] getHeader() {
+		return header;
 	}
 }
