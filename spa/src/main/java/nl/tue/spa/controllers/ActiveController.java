@@ -50,7 +50,7 @@ public class ActiveController implements GUIStateSerializable{
 	}
 	
 	public void stopActive(String program) {
-		Environment.getRunner().removeRunningController(program);
+		Environment.getRunner().removePartyToThread(program);
 		Environment.getEventBus().unsubscribe(program);
 	}
 

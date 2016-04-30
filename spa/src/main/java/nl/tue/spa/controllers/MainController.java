@@ -16,7 +16,6 @@ import nl.tue.spa.core.Main;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.core.guistate.GUIStateSerializable;
 import nl.tue.spa.executor.EvaluationResult;
-import nl.tue.spa.executor.EvaluationResult.ResultType;
 import nl.tue.spa.executor.java.JavaProcessor;
 import nl.tue.spa.gui.MainGUI;
 
@@ -118,46 +117,6 @@ public class MainController implements GUIStateSerializable{
 		}
 		bc.loadContent(script);
 	}	
-
-	/**
-	 * Runs the entire script of the party that is identified by the given filename.
-	 * The party has to be a scripting party, not a graph.
-	 * 
-	 * @param fileName the filename of the party to run the script on.
-	 */
-	public void executeScriptOnParty(String fileName){
-		EditorController etc = Environment.getEditorContainerController().getEditorController(fileName);
-		if (etc != null){
-			etc.executeScript();
-		}
-	}
-	
-	/**
-	 * Runs the given script on the party that is identified by the given filename.
-	 * The party can both be a scripting party and a graph.
-	 * The party's context must be initialized.
-	 * If the execution fails, the party is removed from the list of running threads and 
-	 * any subscriptions and an error is produced on screen. 
-	 * 
-	 * @param fileName the filename of the party to run the script on.
-	 * @param script the script to run.
-	 */
-	public void executeScriptOnParty(String fileName, String script){
-		BrowserController bc = graphWindows.get(fileName);
-		if (bc != null){
-			bc.executeScript(script);
-			return;
-		}
-		EditorController etc = Environment.getEditorContainerController().getEditorController(fileName);
-		if (etc != null){
-			EvaluationResult result = etc.executeScript(script);
-			if (result.getType() == ResultType.ERROR){
-        		Environment.getEventBus().unsubscribe(fileName);
-        		Environment.getRunner().removeRunningController(fileName);
-        		Environment.getMainController().showMessageDialog(fileName + " is active, but an error occurred. Removed it from the list of active parties. Specific error: " + result.getResult(), "Update error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
 	
 	public void closeGraph(BrowserController gc){
 		gc.closeWindow();
@@ -183,7 +142,7 @@ public class MainController implements GUIStateSerializable{
 			System.exit(0);
 		}
 	}
-	
+
 	public GUIState getState(){
 		GUIState gs = new GUIState();
 		gs.putStateVar("BOUNDS", guiMain.getBounds());
@@ -254,5 +213,9 @@ public class MainController implements GUIStateSerializable{
 
 	public void showMessageDialog(String text, String title, int messageType) {
 		JOptionPane.showMessageDialog(guiMain, text, title, messageType);		
+	}
+
+	public BrowserController getGraphWindow(String fileName) {
+		return graphWindows.get(fileName);
 	}
 }

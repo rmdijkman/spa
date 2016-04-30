@@ -9,8 +9,8 @@ import java.util.Set;
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.core.guistate.GUIStateSerializable;
+import nl.tue.spa.executor.Script.ScriptType;
 import nl.tue.spa.gui.EditorContainerGUI;
-import nl.tue.spa.gui.EditorGUI.EditorGUIType;
 
 public class EditorContainerController implements GUIStateSerializable{	
 	
@@ -52,13 +52,13 @@ public class EditorContainerController implements GUIStateSerializable{
 	}
 
 	public void newJavaScriptFile() {
-		EditorController ec = new EditorTextController(EditorGUIType.TYPE_JAVA_SCRIPT);
+		EditorController ec = new EditorTextController(ScriptType.TYPE_JAVA_SCRIPT);
 		editorWindows.add(ec);
 		gui.addEditor("new js", ec);
 	}
 
 	public void newGraphScriptFile() {
-		EditorController ec = new EditorTextController(EditorGUIType.TYPE_GRAPH_SCRIPT);
+		EditorController ec = new EditorTextController(ScriptType.TYPE_GRAPH_SCRIPT);
 		editorWindows.add(ec);
 		gui.addEditor("new graph", ec);
 	}
@@ -131,11 +131,11 @@ public class EditorContainerController implements GUIStateSerializable{
 	public void stopScript() {
 		EditorController ec = gui.getSelectedEditor();
 		if (ec == null) return;
-		Environment.getRunner().removeRunningController(ec.getFileName());
+		Environment.getRunner().removePartyToThread(ec.getFileName());
 	}
 
 	public void newStreamFile() {
-		EditorController ec = new EditorStreamController(EditorGUIType.TYPE_STREAM);
+		EditorController ec = new EditorStreamController(ScriptType.TYPE_STREAM);
 		editorWindows.add(ec);
 		gui.addEditor("new stream", ec);
 	}

@@ -5,11 +5,12 @@ import org.fife.ui.rsyntaxtextarea.TextEditorPane;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import nl.tue.spa.controllers.EditorTextController;
+import nl.tue.spa.executor.Script.ScriptType;
 
 public class EditorTextGUI extends RTextScrollPane implements EditorGUI {
 	private static final long serialVersionUID = 1L;
 
-	public static EditorGUIType[] allEditorTextGUITypes = {EditorGUIType.TYPE_JAVA_SCRIPT,EditorGUIType.TYPE_GRAPH_SCRIPT,EditorGUIType.TYPE_R_SCRIPT};
+	public static ScriptType[] allEditorTextGUITypes = {ScriptType.TYPE_JAVA_SCRIPT,ScriptType.TYPE_GRAPH_SCRIPT,ScriptType.TYPE_R_SCRIPT};
 	
 	EditorTextController controller;
 

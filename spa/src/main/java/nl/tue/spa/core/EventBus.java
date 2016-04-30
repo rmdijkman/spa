@@ -50,7 +50,7 @@ public class EventBus {
 		Set<String> partiesForVariable = subscriptions.get(variable);
 		if (partiesForVariable != null){
 			for (String party: partiesForVariable){
-				Environment.getMainController().executeScriptOnParty(party, "update(\""+variable+"\","+value+")");
+				Environment.getRunner().executeLineOnParty(party, "update(\""+variable+"\","+value+")");
 			}
 		}		
 	}

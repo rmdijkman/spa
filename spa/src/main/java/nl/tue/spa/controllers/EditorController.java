@@ -9,17 +9,17 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.core.guistate.GUIStateSerializable;
-import nl.tue.spa.executor.EvaluationResult;
-import nl.tue.spa.gui.EditorTextGUI;
+import nl.tue.spa.executor.Script;
+import nl.tue.spa.executor.Script.ScriptType;
 import nl.tue.spa.gui.EditorGUI;
-import nl.tue.spa.gui.EditorGUI.EditorGUIType;
 import nl.tue.spa.gui.EditorStreamGUI;
+import nl.tue.spa.gui.EditorTextGUI;
 
 public abstract class EditorController implements GUIStateSerializable {
 
 	String fileName;
 	File file;
-	EditorGUIType type;
+	ScriptType type;
 	boolean saved;
 	
 	public String getFileName(){
@@ -79,7 +79,7 @@ public abstract class EditorController implements GUIStateSerializable {
 		if (lastFolder != null){
 			fc.setCurrentDirectory(new File(lastFolder));
 		}
-		for (EditorGUIType type: EditorGUI.allEditorGUITypes){
+		for (ScriptType type: Script.allScriptTypes){
 			FileNameExtensionFilter filter = new FileNameExtensionFilter(type.getName() + " (." + type.getSuffix() + ")", type.getSuffix());
 			fc.addChoosableFileFilter(filter);
 		}
@@ -92,12 +92,12 @@ public abstract class EditorController implements GUIStateSerializable {
 	}
 
 	public static EditorController load(String fullPath){
-		for (EditorGUIType type: EditorTextGUI.allEditorTextGUITypes){
+		for (ScriptType type: EditorTextGUI.allEditorTextGUITypes){
 			if (fullPath.endsWith("." + type.getSuffix())){
 				return EditorTextController.load(fullPath);
 			}
 		}
-		for (EditorGUIType type: EditorStreamGUI.allEditorStreamGUITypes){
+		for (ScriptType type: EditorStreamGUI.allEditorStreamGUITypes){
 			if (fullPath.endsWith("." + type.getSuffix())){
 				return EditorStreamController.load(fullPath);
 			}
@@ -107,27 +107,18 @@ public abstract class EditorController implements GUIStateSerializable {
 	
 	public static EditorController restoreStateAbstract(GUIState state){
 		String fullPath = (String) state.getStateVar("FILE");
-		for (EditorGUIType type: EditorTextGUI.allEditorTextGUITypes){
+		for (ScriptType type: EditorTextGUI.allEditorTextGUITypes){
 			if (fullPath.endsWith("." + type.getSuffix())){
 				EditorTextController etc = new EditorTextController();
 				etc.restoreState(state);
 				return etc;
 			}
 		}
-		for (EditorGUIType type: EditorStreamGUI.allEditorStreamGUITypes){
+		for (ScriptType type: EditorStreamGUI.allEditorStreamGUITypes){
 			if (fullPath.endsWith("." + type.getSuffix())){
 				EditorStreamController esc = new EditorStreamController();
 				esc.restoreState(state);
 				return esc;
-			}
-		}
-		return null;
-	}
-
-	public EditorGUIType getTypeFromFileName(){
-		for (EditorGUIType type: EditorGUI.allEditorGUITypes){
-			if (fileName.endsWith("." + type.getSuffix())){
-				return type;
 			}
 		}
 		return null;
@@ -162,9 +153,5 @@ public abstract class EditorController implements GUIStateSerializable {
 
 	public abstract EditorGUI getGUI();
 	
-	public abstract void runScript();
-	
-	public abstract EvaluationResult executeScript(String script);
-
-	public abstract EvaluationResult executeScript();
+	public abstract void runScript();	
 }

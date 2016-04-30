@@ -3,9 +3,13 @@ package nl.tue.spa.gui;
 import javax.swing.JPanel;
 
 import nl.tue.spa.controllers.EditorStreamController;
+import nl.tue.spa.core.Environment;
+import nl.tue.spa.executor.Script.ScriptType;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -16,13 +20,17 @@ import org.apache.commons.csv.CSVFormat;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.ActionEvent;
+import java.io.File;
+
 import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
 import javax.swing.ImageIcon;
@@ -30,12 +38,13 @@ import javax.swing.ImageIcon;
 public class EditorStreamGUI extends JPanel implements EditorGUI, ActionListener, KeyListener {
 	private static final long serialVersionUID = 1L;
 
-	public static EditorGUIType[] allEditorStreamGUITypes = {EditorGUIType.TYPE_STREAM};
+	public static ScriptType[] allEditorStreamGUITypes = {ScriptType.TYPE_STREAM};
 	
 	EditorStreamController controller;
 	private JTextField txtFile;
 	private JTable table;
 	private JTextField txtDelimiter;
+	private String selectedFile;
 
 	private JRadioButton rdbtnTDF;
 	private JRadioButton rdbtnRFC4180;
@@ -67,7 +76,9 @@ public class EditorStreamGUI extends JPanel implements EditorGUI, ActionListener
 		btnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				controller.fileChanged();
-				controller.loadCSV();
+				if (selectFile()){
+					controller.refreshFile();
+				}
 			}
 		});
 		btnFile.setBounds(368, 48, 32, 28);
@@ -179,38 +190,18 @@ public class EditorStreamGUI extends JPanel implements EditorGUI, ActionListener
 		}
 		return CSVFormat.DEFAULT;
 	}
-
-	public int getSelectedCSVFormatAsNumber() {
-		if (rdbtnTDF.isSelected()){
-			return 1;
-		}else if (rdbtnRFC4180.isSelected()){
-			return 2;
-		}else if (rdbtnMySQL.isSelected()){
-			return 3;
-		}else if (rdbtnExcel.isSelected()){
-			return 4;
-		}
-		return 0;
-	}
 	
-	public void setSelectedCSVFormatAsNumber(int number) {
-		switch (number){
-		case 1:
+	public void setSelectedCSVFormat(CSVFormat csvFormat) {
+		if (csvFormat == CSVFormat.TDF){
 			rdbtnTDF.setSelected(true);
-			break;
-		case 2:
+		}else if (csvFormat == CSVFormat.RFC4180){
 			rdbtnRFC4180.setSelected(true);
-			break;
-		case 3:
+		}else if (csvFormat == CSVFormat.MYSQL){
 			rdbtnMySQL.setSelected(true);
-			break;
-		case 4:
+		}else if (csvFormat == CSVFormat.EXCEL){
 			rdbtnExcel.setSelected(true);
-			break;
-		default:
-			rdbtnDefault.setSelected(true);
-			break;
 		}
+		rdbtnDefault.setSelected(true);
 	}	
 
 	public char getDelimiter() {		
@@ -240,14 +231,6 @@ public class EditorStreamGUI extends JPanel implements EditorGUI, ActionListener
 		for (int i = 0; i < sData.length; i++){
 			model.addRow(sData[i]);
 		}
-	}
-	
-	public void setFileName(String fileName){
-		txtFile.setText(fileName);
-	}
-
-	public String getFileName(){
-		return txtFile.getText();
 	}
 	
 	public String getVariableName(){
@@ -293,6 +276,24 @@ public class EditorStreamGUI extends JPanel implements EditorGUI, ActionListener
 
 	    }
 	}
+	
+	private boolean selectFile(){
+		final JFileChooser fc = new JFileChooser();
+		String lastFolder = Environment.getProperties().getLastFolder();
+		if (lastFolder != null){
+			fc.setCurrentDirectory(new File(lastFolder));
+		}
+		fc.setAcceptAllFileFilterUsed(false);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma Separated (.csv)", "csv");
+		fc.addChoosableFileFilter(filter);
+		int returnVal = Environment.getMainController().showDialog(fc, "Open");
+		if (returnVal == JFileChooser.APPROVE_OPTION){
+			selectedFile = fc.getSelectedFile().getAbsolutePath();
+			txtFile.setText(fc.getSelectedFile().getName());
+			return true;
+		}
+		return false;
+	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
@@ -310,5 +311,13 @@ public class EditorStreamGUI extends JPanel implements EditorGUI, ActionListener
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		controller.fileChanged();
+	}
+
+	public String getSelectedFile() {
+		return selectedFile;
+	}
+	
+	public void setSelectedFile(String selectedFile) {
+		this.selectedFile = selectedFile;
 	}
 }

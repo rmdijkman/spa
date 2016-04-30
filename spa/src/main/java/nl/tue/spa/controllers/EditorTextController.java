@@ -2,39 +2,30 @@ package nl.tue.spa.controllers;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 import javax.swing.JOptionPane;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
-
 import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
-import nl.tue.spa.executor.EvaluationResult;
-import nl.tue.spa.executor.EvaluationResult.ResultType;
-import nl.tue.spa.executor.java.JavaProcessor;
+import nl.tue.spa.executor.GraphScript;
+import nl.tue.spa.executor.JavaScript;
+import nl.tue.spa.executor.Script;
+import nl.tue.spa.executor.Script.ScriptType;
 import nl.tue.spa.gui.EditorGUI;
 import nl.tue.spa.gui.EditorTextGUI;
-import nl.tue.spa.gui.EditorGUI.EditorGUIType;
 
 public class EditorTextController extends EditorController implements KeyListener {
 
 	EditorTextGUI gui;
-	Context context;
-	Scriptable scope;
 	
 	public EditorTextController() {
 		this.gui = new EditorTextGUI(this);
-		saved = false;
+		saved = false;		
 	}
 
-	public EditorTextController(EditorGUIType type) {
+	public EditorTextController(ScriptType type) {
 		this();
 		this.type = type;
 	}
@@ -58,13 +49,12 @@ public class EditorTextController extends EditorController implements KeyListene
 			}
 			switch (type){
 			case TYPE_JAVA_SCRIPT:
-				runJavaScript();
+				Environment.getRunner().addPartyToRun(file);
 				break;
 			case TYPE_GRAPH_SCRIPT:
-				runGraphScript();
+				Environment.getRunner().addPartyToRun(file);
 				break;
 			case TYPE_R_SCRIPT:
-				runRScript();
 				break;
 			default:
 				break;
@@ -72,30 +62,6 @@ public class EditorTextController extends EditorController implements KeyListene
 		}
 	}
 	
-	private void runJavaScript() {
-		Environment.getRunner().addOnceRunningController(fileName);
-	}
-
-	private void runGraphScript() {
-		String script = gui.getScript();
-		String variables = "<script>\n" + JavaProcessor.getVariablesAsScript() + "</script>\n";
-		int headIndex = script.indexOf("<head>");
-		if (headIndex != -1){
-			script = script.substring(0, headIndex + 6) + variables + script.substring(headIndex + 6);
-		}else{
-			int bodyIndex = script.indexOf("<body>");
-			if (bodyIndex != -1){
-				script = script.substring(0, bodyIndex + 6) + variables + script.substring(bodyIndex + 6);
-			}else{
-				JOptionPane.showMessageDialog(gui, "Cannot create graph, because your graph script does not contain a head or a body tag.", "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-		Environment.getMainController().newOrUpdatedGraph(fileName, script);
-	}
-		
-	private void runRScript() {
-	}
-
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
@@ -120,14 +86,22 @@ public class EditorTextController extends EditorController implements KeyListene
 			}
 		}
 		try{
-			if (!file.exists()) {
-				file.createNewFile();
+			switch (type){
+			case TYPE_JAVA_SCRIPT:
+				JavaScript javaScript = new JavaScript(file);
+				javaScript.setScript(gui.getScript());
+				javaScript.save();
+				break;
+			case TYPE_GRAPH_SCRIPT:
+				GraphScript graphScript = new GraphScript(file);
+				graphScript.setScript(gui.getScript());
+				graphScript.save();
+				break;
+			case TYPE_R_SCRIPT:
+				break;
+			default:
+				break;
 			}
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(gui.getScript());
-			bw.flush();
-			bw.close();
 		}catch (Exception e){
 			file = null;
 			fileName = null;
@@ -144,13 +118,27 @@ public class EditorTextController extends EditorController implements KeyListene
 		EditorTextController ec = new EditorTextController();
 		ec.file = new File(fullPath);
 		ec.fileName = ec.file.getName();
-		ec.type = ec.getTypeFromFileName();
+		ec.type = Script.getTypeFromFileName(ec.fileName);
 		try{
 			if (ec.type == null){
 				throw new IOException("The extension of the filename is not of a known type.");
 			}
-			byte[] encoded = Files.readAllBytes(ec.file.toPath());
-			ec.gui.setScript(new String(encoded, StandardCharsets.UTF_8));
+			switch (ec.type){
+			case TYPE_JAVA_SCRIPT:
+				JavaScript javaScript = new JavaScript(ec.file);
+				javaScript.load();
+				ec.gui.setScript(javaScript.getScript());
+				break;
+			case TYPE_GRAPH_SCRIPT:
+				GraphScript graphScript = new GraphScript(ec.file);
+				graphScript.load();
+				ec.gui.setScript(graphScript.getScript());
+				break;
+			case TYPE_R_SCRIPT:
+				break;
+			default:
+				break;
+			}
 		}catch (Exception e){
 			JOptionPane.showMessageDialog(ec.gui, "An error occurred while trying to load the file: " + e.getMessage(), "Load error", JOptionPane.ERROR_MESSAGE);
 			return null;
@@ -179,41 +167,5 @@ public class EditorTextController extends EditorController implements KeyListene
 			saved = ec.saved;
 			Environment.getEditorContainerController().updateSavedState();
 		}
-	}
-
-	/**
-	 * Executes the given script on the existing context of the script.
-	 * Requires that this controller represents a JavaScript.
-	 * Requires that a context belonging to this controller already exists.
-	 * (This context is produced by calling executeJavaScript().)
-	 *  
-	 * @param script The script to execute. Must be JavaScript.
-	 * @return The result of the evaluation of the script
-	 */
-	public EvaluationResult executeScript(String script) {
-		MainController mc = Environment.getMainController();
-		EvaluationResult result = JavaProcessor.evaluateScript(context, scope, script, "");
-		mc.updateJavaScope();
-		
-		return result;
-	}
-	/**
-	 * Executes the entire script that belongs to this controller.
-	 * Requires that this controller represents a JavaScript.
-	 * Creates a context for the script that belongs to this controller.
-	 * 
-	 * @return The result of the evaluation of the script that belongs to this controller
-	 */
-	public EvaluationResult executeScript(){
-		MainController mc = Environment.getMainController();
-		context = JavaProcessor.initializeContext();
-		scope = JavaProcessor.initializeScope(context);
-		EvaluationResult er = JavaProcessor.evaluateScript(context, scope, gui.getScript(), "");
-		if (er.getType() != ResultType.UNDEFINED){
-			mc.printEntry("\n");
-			mc.printResult(er);
-		}
-		mc.updateJavaScope();
-		return er;
 	}
 }

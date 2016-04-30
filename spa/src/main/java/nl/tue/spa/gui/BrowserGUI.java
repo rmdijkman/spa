@@ -61,8 +61,8 @@ public class BrowserGUI extends JInternalFrame{
             	window.setMember("consolecontroller", Environment.getConsoleController());
             	window.setMember("runnercore", Environment.getRunner());
             	engine.executeScript("console.log = function(message){consolecontroller.log(message);};");
-            	engine.executeScript("runner = {start: function(party){runnercore.addRunningController(party);},"+
-            									"stop: function(party){runnercore.removeRunningController(party);}};");
+            	engine.executeScript("runner = {start: function(party){runnercore.addPartyToThread(party);},"+
+            									"stop: function(party){runnercore.removePartyToThread(party);}};");
             	window.setMember("eventbus", Environment.getEventBus());
                 
             	engine.loadContent(content);            	
@@ -78,7 +78,7 @@ public class BrowserGUI extends JInternalFrame{
             		engine.executeScript(script);
             	}catch (Exception e){
             		Environment.getEventBus().unsubscribe(controller.getFileName());
-            		Environment.getRunner().removeRunningController(controller.getFileName());            		
+            		Environment.getRunner().removePartyToThread(controller.getFileName());            		
             		Environment.getMainController().showMessageDialog(controller.getFileName() + " is active, but an error occurred. Removed it from the list of active parties. Specific error: " + e.getMessage(), "Update error", JOptionPane.ERROR_MESSAGE);
             	}
             }
