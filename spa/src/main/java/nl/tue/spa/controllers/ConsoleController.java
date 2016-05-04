@@ -1,6 +1,5 @@
 package nl.tue.spa.controllers;
 
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -11,14 +10,12 @@ import org.mozilla.javascript.Scriptable;
 
 import nl.tue.spa.core.AppClipboard;
 import nl.tue.spa.core.Environment;
-import nl.tue.spa.core.guistate.GUIState;
-import nl.tue.spa.core.guistate.GUIStateSerializable;
 import nl.tue.spa.executor.EvaluationResult;
 import nl.tue.spa.executor.EvaluationResult.ResultType;
 import nl.tue.spa.executor.java.JavaProcessor;
 import nl.tue.spa.gui.ConsoleGUI;
 
-public class ConsoleController implements KeyListener, GUIStateSerializable {
+public class ConsoleController implements KeyListener {
 
 	ConsoleGUI gui;
 	
@@ -134,14 +131,14 @@ public class ConsoleController implements KeyListener, GUIStateSerializable {
 		caretPosition = gui.getCaretPosition();
 	}
 
-	public void closeWindow() {
-		gui.setVisible(false);
-		Environment.getMainController().removeWindow(gui);
-	}
-	
 	public void openWindow() {
 		Environment.getMainController().addWindow(gui);
 		gui.setVisible(true);
+	}
+	
+	public void closeWindow() {
+		gui.setVisible(false);
+		Environment.getMainController().removeWindow(gui);
 	}
 	
 	public void log(String text){
@@ -149,17 +146,5 @@ public class ConsoleController implements KeyListener, GUIStateSerializable {
 		gui.printPrompt();
 		gui.setCaretPosition(gui.getTextLength());
 		caretPosition = gui.getCaretPosition();
-	}
-
-	@Override
-	public GUIState getState() {
-		GUIState gs = new GUIState();
-		gs.putStateVar("BOUNDS", gui.getBounds());
-		return gs;
-	}
-
-	@Override
-	public void restoreState(GUIState state) {
-		gui.setBounds((Rectangle) state.getStateVar("BOUNDS"));
 	}
 }

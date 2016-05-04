@@ -11,10 +11,12 @@ import nl.tue.spa.core.Environment;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JDesktopPane;
 import java.awt.Toolkit;
 import javax.swing.JSeparator;
+import javax.swing.JSplitPane;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDesktopPane;
+
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -26,11 +28,18 @@ public class MainGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private JPanel contentPane;
-	private JDesktopPane desktopPane;
+	
+	private JSplitPane splitRoot2TopBottom;
+	private JSplitPane splitTop2BrowserEditor;
+	private JSplitPane splitBottom2ConsoleRunning;
+	private JSplitPane splitRunning2VariablesActive;
+	
 	private JCheckBoxMenuItem chckbxmntmConsole;
 	private JCheckBoxMenuItem chckbxmntmVariables;
 	private JCheckBoxMenuItem chckbxmntmActive;
 	private JCheckBoxMenuItem chckbxmntmEditor;
+	
+	private JDesktopPane desktopBrowserContainer;
 	
 	/**
 	 * Create the frame.
@@ -185,15 +194,26 @@ public class MainGUI extends JFrame {
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+
+		desktopBrowserContainer = new JDesktopPane();
 		
-		desktopPane = new JDesktopPane();
-		contentPane.add(desktopPane, BorderLayout.CENTER);
+		splitRoot2TopBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitTop2BrowserEditor = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitBottom2ConsoleRunning = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitRunning2VariablesActive = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		splitRoot2TopBottom.setTopComponent(splitTop2BrowserEditor);
+		splitRoot2TopBottom.setBottomComponent(splitBottom2ConsoleRunning);
+		splitBottom2ConsoleRunning.setRightComponent(splitRunning2VariablesActive);
+		splitRoot2TopBottom.setDividerLocation(700);
+		splitTop2BrowserEditor.setDividerLocation(500);
+		splitBottom2ConsoleRunning.setDividerLocation(600);
+		splitRunning2VariablesActive.setDividerLocation(300);		
+		
+		splitTop2BrowserEditor.setLeftComponent(desktopBrowserContainer);
+		
+		contentPane.add(splitRoot2TopBottom, BorderLayout.CENTER);
 	}
 	
-	public JDesktopPane getDesktopPane(){
-		return desktopPane;
-	}
-
 	public void setMenuConsoleSelected(boolean b) {
 		chckbxmntmConsole.setState(b);
 	}
@@ -209,4 +229,50 @@ public class MainGUI extends JFrame {
 	public void setMenuEditorSelected(boolean b) {
 		chckbxmntmEditor.setState(b);
 	}
+
+	public void addWindow(Component gui){
+		if (gui instanceof ConsoleGUI){
+			splitBottom2ConsoleRunning.setLeftComponent(gui);
+			gui.validate();
+		}else if (gui instanceof EditorContainerGUI){
+			splitTop2BrowserEditor.setRightComponent(gui);
+			gui.validate();
+		}else if (gui instanceof ActiveGUI){
+			splitRunning2VariablesActive.setRightComponent(gui);
+			gui.validate();
+		}else if (gui instanceof VariablesGUI){
+			splitRunning2VariablesActive.setLeftComponent(gui);
+			gui.validate();
+		}else if (gui instanceof BrowserGUI){
+			desktopBrowserContainer.add(gui);
+		}
+	}
+
+	public void removeWindow(Component gui){
+		if (gui instanceof ConsoleGUI){
+			splitBottom2ConsoleRunning.remove(gui);
+		}else if (gui instanceof EditorContainerGUI){
+			splitTop2BrowserEditor.remove(gui);
+		}else if (gui instanceof ActiveGUI){
+			splitRunning2VariablesActive.remove(gui);
+		}else if (gui instanceof VariablesGUI){
+			splitRunning2VariablesActive.remove(gui);
+		}
+	}
+
+	public int[] getDividerLocations(){
+		int[] result = new int[4];
+		result[0] = splitRoot2TopBottom.getDividerLocation();
+		result[1] = splitTop2BrowserEditor.getDividerLocation();
+		result[2] = splitBottom2ConsoleRunning.getDividerLocation();
+		result[3] = splitRunning2VariablesActive.getDividerLocation();
+		return result;
+	}
+	
+	public void setDividerLocations(int[] dividerLocations){
+		splitTop2BrowserEditor.setDividerLocation(dividerLocations[1]);
+		splitBottom2ConsoleRunning.setDividerLocation(dividerLocations[2]);
+		splitRunning2VariablesActive.setDividerLocation(dividerLocations[3]);		
+		splitRoot2TopBottom.setDividerLocation(dividerLocations[0]);
+	}	
 }

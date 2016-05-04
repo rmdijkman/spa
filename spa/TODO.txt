@@ -27,5 +27,4 @@ Additional component: visualization template
 Additional component: reduction (attaches directly to a stream, only events that pass reduction are kept, does not look inside event data)
 Additional component: transformation/filtering (this is also basically a js or R file, but with 'subscribe' or 'run' functionality, maybe do not distinguish them from libraries)
 Additional component: run configuration
-Replace internal frames with split panes
 Java objects cannot be used, because they cannot be serialized to JSON. Serialize them using Java Serializable instead.

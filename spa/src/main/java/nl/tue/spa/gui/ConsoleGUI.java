@@ -4,13 +4,10 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.plaf.basic.BasicInternalFrameUI;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
@@ -18,17 +15,15 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import nl.tue.spa.controllers.ConsoleController;
-import nl.tue.spa.core.Environment;
 import nl.tue.spa.executor.r.RConsole;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-public class ConsoleGUI extends JInternalFrame implements RConsole{
+public class ConsoleGUI extends JPanel implements RConsole{
 	private static final long serialVersionUID = 1L;
 	
 	private static String PROMPT = "> ";
@@ -41,22 +36,9 @@ public class ConsoleGUI extends JInternalFrame implements RConsole{
 	JTextPane textPane;	
 	
 	public ConsoleGUI(ConsoleController controller){
-		super("Console", true, true, false, false);
-		setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-		this.addInternalFrameListener(new InternalFrameAdapter(){
-			public void internalFrameClosing(InternalFrameEvent e){
-				Environment.getMainController().closeConsole();
-			}
-		});
-		setBounds(0, 0, 800, 600);
-		setResizable(true);
-		BasicInternalFrameUI ui = (BasicInternalFrameUI) getUI();
-		Container north = (Container) ui.getNorthPane();
-		north.remove(0);
-		north.validate();
-		north.repaint();
-
 		this.controller = controller;
+		
+		this.setLayout(new BorderLayout());
 
 		textPane = new JTextPane();
 		replaceKeyByAction(KeyEvent.VK_ENTER);
@@ -67,11 +49,12 @@ public class ConsoleGUI extends JInternalFrame implements RConsole{
 		LEFT_ACTION = (String) textPane.getInputMap().get(KeyStroke.getKeyStroke("LEFT"));
 		textPane.addKeyListener(controller);
 		textPane.setFont(new Font("Courier New", Font.PLAIN, 13));
+
 		JScrollPane scrollPane = new JScrollPane(textPane);
 
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
+		add(scrollPane, BorderLayout.CENTER);
 	}
-	
+		
 	public void disableMoveLeft(){
 		textPane.getInputMap().put(KeyStroke.getKeyStroke("BACK_SPACE"), "none");
 		textPane.getInputMap().put(KeyStroke.getKeyStroke("LEFT"), "none");

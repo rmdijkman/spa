@@ -1,6 +1,5 @@
 package nl.tue.spa.controllers;
 
-import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -102,7 +101,6 @@ public class EditorContainerController implements GUIStateSerializable{
 	@Override
 	public GUIState getState() {
 		GUIState gs = new GUIState();
-		gs.putStateVar("BOUNDS", gui.getBounds());
 		List<GUIState> editors = new ArrayList<GUIState>();
 		for (EditorController ec: editorWindows){
 			GUIState ecState = ec.getState();
@@ -116,7 +114,6 @@ public class EditorContainerController implements GUIStateSerializable{
 
 	@Override
 	public void restoreState(GUIState state) {
-		gui.setBounds((Rectangle) state.getStateVar("BOUNDS"));
 		@SuppressWarnings("unchecked")
 		List<GUIState> editors = (ArrayList<GUIState>) state.getStateVar("EDITORS");
 		for (GUIState editorState: editors){

@@ -3,29 +3,24 @@ package nl.tue.spa.gui;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import nl.tue.spa.controllers.VariablesController;
-import nl.tue.spa.core.Environment;
 
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.basic.BasicInternalFrameUI;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class VariablesGUI extends JInternalFrame implements ListSelectionListener{
+public class VariablesGUI extends JPanel implements ListSelectionListener{
 	private static final long serialVersionUID = 1L;
 	
 	private static String columnNames[] = {"variable", "value"};
@@ -35,27 +30,14 @@ public class VariablesGUI extends JInternalFrame implements ListSelectionListene
 	JButton btnRemove;
 	
 	public VariablesGUI(VariablesController controller){
-		super("Variables", true, true, false, false);
-		setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-		this.addInternalFrameListener(new InternalFrameAdapter(){
-			public void internalFrameClosing(InternalFrameEvent e){
-				Environment.getMainController().closeVariablesWindow();
-			}
-		});
-		setBounds(0, 0, 800, 600);
-		setResizable(true);
-		BasicInternalFrameUI ui = (BasicInternalFrameUI) getUI();
-		Container north = (Container) ui.getNorthPane();
-		north.remove(0);
-		north.validate();
-		north.repaint();
-		
 		this.controller = controller;
 
+		this.setLayout(new BorderLayout());
+		
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		toolBar.setFocusable(false);
-		getContentPane().add(toolBar, BorderLayout.NORTH);
+		add(toolBar, BorderLayout.NORTH);
 				
 		JButton btnSave = new JButton("");
 		btnSave.setToolTipText("Clear variables");
@@ -95,7 +77,7 @@ public class VariablesGUI extends JInternalFrame implements ListSelectionListene
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
+		add(scrollPane, BorderLayout.CENTER);
 	}
 	
 	public void setVariable(String name, String value){

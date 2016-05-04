@@ -26,7 +26,7 @@ public class BrowserGUI extends JInternalFrame{
     private final JFXPanel jfxPanel;
     private WebEngine engine;
 	
-	public BrowserGUI(BrowserController controller){
+    public BrowserGUI(BrowserController controller){
 		super("View", true, true, false, false);
 		setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
 		this.addInternalFrameListener(new InternalFrameAdapter(){

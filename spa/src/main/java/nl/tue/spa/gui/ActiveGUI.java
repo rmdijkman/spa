@@ -2,28 +2,23 @@ package nl.tue.spa.gui;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JInternalFrame;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import nl.tue.spa.controllers.ActiveController;
-import nl.tue.spa.core.Environment;
 
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.basic.BasicInternalFrameUI;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ActiveGUI extends JInternalFrame implements ListSelectionListener{
+public class ActiveGUI extends JPanel implements ListSelectionListener{
 	private static final long serialVersionUID = 1L;
 	
 	public enum ActiveType {
@@ -43,28 +38,15 @@ public class ActiveGUI extends JInternalFrame implements ListSelectionListener{
 	private JTable table;
 	private JButton btnRemove;
 	
-	public ActiveGUI(ActiveController controller){
-		super("Active", true, true, false, false);
-		setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-		this.addInternalFrameListener(new InternalFrameAdapter(){
-			public void internalFrameClosing(InternalFrameEvent e){
-				Environment.getMainController().closeActiveWindow();
-			}
-		});
-		setBounds(0, 0, 800, 600);
-		setResizable(true);
-		BasicInternalFrameUI ui = (BasicInternalFrameUI) getUI();
-		Container north = (Container) ui.getNorthPane();
-		north.remove(0);
-		north.validate();
-		north.repaint();
-		
+	public ActiveGUI(ActiveController controller){		
 		this.controller = controller;
+		
+		this.setLayout(new BorderLayout());
 
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		toolBar.setFocusable(false);
-		getContentPane().add(toolBar, BorderLayout.NORTH);
+		add(toolBar, BorderLayout.NORTH);
 		
 		btnRemove = new JButton("");
 		btnRemove.setToolTipText("Stop");
@@ -88,7 +70,7 @@ public class ActiveGUI extends JInternalFrame implements ListSelectionListener{
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		
-		getContentPane().add(scrollPane, BorderLayout.CENTER);
+		add(scrollPane, BorderLayout.CENTER);
 	}
 	
 	public void addActive(String program, ActiveType at) {

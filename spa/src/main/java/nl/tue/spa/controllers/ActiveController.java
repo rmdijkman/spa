@@ -1,13 +1,10 @@
 package nl.tue.spa.controllers;
 
-import java.awt.Rectangle;
 
 import nl.tue.spa.core.Environment;
-import nl.tue.spa.core.guistate.GUIState;
-import nl.tue.spa.core.guistate.GUIStateSerializable;
 import nl.tue.spa.gui.ActiveGUI;
 
-public class ActiveController implements GUIStateSerializable{
+public class ActiveController{
 
 	ActiveGUI gui;
 	
@@ -23,18 +20,6 @@ public class ActiveController implements GUIStateSerializable{
 	public void openWindow() {
 		Environment.getMainController().addWindow(gui);
 		gui.setVisible(true);
-	}
-
-	@Override
-	public GUIState getState() {
-		GUIState gs = new GUIState();
-		gs.putStateVar("BOUNDS", gui.getBounds());
-		return gs;
-	}
-
-	@Override
-	public void restoreState(GUIState state) {
-		gui.setBounds((Rectangle) state.getStateVar("BOUNDS"));
 	}
 	
 	public boolean isActive(String program){

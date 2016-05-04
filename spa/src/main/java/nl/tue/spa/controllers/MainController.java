@@ -1,11 +1,11 @@
 package nl.tue.spa.controllers;
 
+import java.awt.Component;
 import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JFileChooser;
-import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
 import org.mozilla.javascript.Context;
@@ -28,7 +28,7 @@ public class MainController implements GUIStateSerializable{
 	private boolean variablesVisible;
 	private boolean editorVisible;
 	private boolean activeVisible;
-
+	
 	public MainController() {
 		this.guiMain = new MainGUI();
 	}
@@ -38,18 +38,18 @@ public class MainController implements GUIStateSerializable{
 		graphWindows = new HashMap<String, BrowserController>();
 	}
 		
-	public void closeConsole() {
-		ConsoleController cc = Environment.getConsoleController();
-		cc.closeWindow();
-		guiMain.setMenuConsoleSelected(false);
-		consoleVisible = false;
-	}
-
 	public void openConsole() {
 		ConsoleController cc = Environment.getConsoleController();
 		cc.openWindow();
 		guiMain.setMenuConsoleSelected(true);
 		consoleVisible = true;
+	}
+
+	public void closeConsole() {
+		ConsoleController cc = Environment.getConsoleController();
+		cc.closeWindow();
+		guiMain.setMenuConsoleSelected(false);
+		consoleVisible = false;
 	}
 
 	public void newJavaScriptFile() {
@@ -122,14 +122,6 @@ public class MainController implements GUIStateSerializable{
 		gc.closeWindow();
 	}
 	
-	public void addWindow(JInternalFrame window){
-		guiMain.getDesktopPane().add(window);
-	}
-
-	public void removeWindow(JInternalFrame window){
-		guiMain.getDesktopPane().remove(window);
-	}
-
 	public void loadFile() {
 		Environment.getEditorContainerController().loadFile();
 	}
@@ -137,7 +129,7 @@ public class MainController implements GUIStateSerializable{
 	public void closeProgram() {
 		boolean closeCanContinue = Environment.getEditorContainerController().closeEditors();
 		if (closeCanContinue){
-			Main.saveState();;
+			Main.saveState();
 		
 			System.exit(0);
 		}
@@ -146,27 +138,23 @@ public class MainController implements GUIStateSerializable{
 	public GUIState getState(){
 		GUIState gs = new GUIState();
 		gs.putStateVar("BOUNDS", guiMain.getBounds());
+		gs.putStateVar("DIVIDER_LOCATIONS", guiMain.getDividerLocations());
 		gs.putStateVar("WINDOW_STATE", guiMain.getExtendedState());		
 		gs.putStateVar("CONSOLE_VISIBLE", consoleVisible);
-		gs.putStateVar("CONSOLE", Environment.getConsoleController().getState());
 		gs.putStateVar("VARIABLES_VISIBLE", variablesVisible);
-		gs.putStateVar("VARIABLES", Environment.getVariablesController().getState());
 		gs.putStateVar("VARIABLE_VALUES", JavaProcessor.getVariablesAsScript());
 		gs.putStateVar("EDITOR_VISIBLE", editorVisible);
 		gs.putStateVar("EDITOR", Environment.getEditorContainerController().getState());
 		gs.putStateVar("ACTIVE_VISIBLE", activeVisible);
-		gs.putStateVar("ACTIVE", Environment.getActiveController().getState());
 		return gs;
 	}
 	
 	public void restoreState(GUIState state){
 		guiMain.setBounds((Rectangle) state.getStateVar("BOUNDS"));
 		guiMain.setExtendedState((int) state.getStateVar("WINDOW_STATE"));
-		Environment.getConsoleController().restoreState((GUIState) state.getStateVar("CONSOLE")); 
 		if ((Boolean) state.getStateVar("CONSOLE_VISIBLE")){
 			openConsole();
 		}
-		Environment.getVariablesController().restoreState((GUIState) state.getStateVar("VARIABLES")); 
 		if ((Boolean) state.getStateVar("VARIABLES_VISIBLE")){
 			openVariablesWindow();
 		}
@@ -179,10 +167,10 @@ public class MainController implements GUIStateSerializable{
 		if ((Boolean) state.getStateVar("EDITOR_VISIBLE")){
 			openEditorWindow();
 		}
-		Environment.getActiveController().restoreState((GUIState) state.getStateVar("ACTIVE")); 
 		if ((Boolean) state.getStateVar("ACTIVE_VISIBLE")){
 			openActiveWindow();
 		}
+		guiMain.setDividerLocations((int[]) state.getStateVar("DIVIDER_LOCATIONS"));
 	}
 
 	public void closeEditorWindow() {
@@ -217,5 +205,14 @@ public class MainController implements GUIStateSerializable{
 
 	public BrowserController getGraphWindow(String fileName) {
 		return graphWindows.get(fileName);
+	}
+
+	public void addWindow(Component gui) {
+		guiMain.addWindow(gui);
+		guiMain.setDividerLocations(guiMain.getDividerLocations());
+	}
+
+	public void removeWindow(Component gui) {
+		guiMain.removeWindow(gui);
 	}
 }

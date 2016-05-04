@@ -3,34 +3,28 @@ package nl.tue.spa.gui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import nl.tue.spa.controllers.EditorContainerController;
 import nl.tue.spa.controllers.EditorController;
-import nl.tue.spa.core.Environment;
 
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionEvent;
 
-public class EditorContainerGUI extends JInternalFrame{
+public class EditorContainerGUI extends JPanel{
 	private static final long serialVersionUID = 1L;
 
 	EditorContainerController controller;
@@ -39,27 +33,14 @@ public class EditorContainerGUI extends JInternalFrame{
 	JTabbedPane tabbedPane;
 	
 	public EditorContainerGUI(EditorContainerController controller){
-		super("Editor", true, true, false, false);
-		setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-		this.addInternalFrameListener(new InternalFrameAdapter(){
-			public void internalFrameClosing(InternalFrameEvent e){
-				Environment.getMainController().closeEditorWindow();
-			}
-		});
-		setBounds(0, 0, 800, 600);
-		setResizable(true);	
-		BasicInternalFrameUI ui = (BasicInternalFrameUI) getUI();
-		Container north = (Container) ui.getNorthPane();
-		north.remove(0);
-		north.validate();
-		north.repaint();
-		
 		this.controller = controller;
+		
+		this.setLayout(new BorderLayout());
 		
 		JToolBar toolBar = new JToolBar();
 		toolBar.setFloatable(false);
 		toolBar.setFocusable(false);
-		getContentPane().add(toolBar, BorderLayout.NORTH);
+		add(toolBar, BorderLayout.NORTH);
 				
 		btnSave = new JButton("");
 		btnSave.setToolTipText("Save");
@@ -94,7 +75,8 @@ public class EditorContainerGUI extends JInternalFrame{
         		controller.editorSelected();
 	        }
 	    });
-		getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		
+		add(tabbedPane, BorderLayout.CENTER);
 	}
 	
 	public void addEditor(String label, EditorController editor){
