@@ -215,4 +215,8 @@ public class MainController implements GUIStateSerializable{
 	public void removeWindow(Component gui) {
 		guiMain.removeWindow(gui);
 	}
+
+	public void newRScriptFile() {
+		Environment.getEditorContainerController().newRScriptFile();
+	}
 }

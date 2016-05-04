@@ -54,7 +54,8 @@ public abstract class Script {
 			Script graphScript = new GraphScript(file);
 			return graphScript;
 		case TYPE_R_SCRIPT:
-			break;
+			Script rScript = new RScript(file);
+			return rScript;
 		case TYPE_STREAM:
 			Script streamScript = new StreamScript(file);
 			return streamScript;

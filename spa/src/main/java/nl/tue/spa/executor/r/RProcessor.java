@@ -1,6 +1,12 @@
 package nl.tue.spa.executor.r;
 
 import org.rosuda.JRI.Rengine;
+
+import nl.tue.spa.core.Environment;
+import nl.tue.spa.executor.EvaluationResult;
+import nl.tue.spa.executor.java.JavaProcessor;
+
+import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RMainLoopCallbacks;
 
 class RCallbacks implements RMainLoopCallbacks {
@@ -51,27 +57,38 @@ class RCallbacks implements RMainLoopCallbacks {
 
 public class RProcessor {
 	
-	Rengine re;
-	RCallbacks rCallbacks;
+	private Rengine rEngine;
+	private RCallbacks rCallbacks;
 	
-	public RProcessor(){
+	private static RProcessor singleton;
+	
+	private RProcessor(){
 		rCallbacks = new RCallbacks();
-		re = new Rengine(new String[0], false, rCallbacks);
+		rCallbacks.attachConsole(Environment.getConsoleController());
+		System.out.println("Creating Rengine (with arguments)");
+		rEngine = new Rengine(new String[0], false, rCallbacks);
 		if (!Rengine.versionCheck()) {
 			System.err.println("** Version mismatch - Java files don't match library version.");
 			System.exit(1);
 		}
-		System.out.println("Creating Rengine (with arguments)");
-		re = new Rengine();
 		System.out.println("Rengine created, waiting for R");
-		if (!re.waitForR()) {
+		if (!rEngine.waitForR()) {
 			System.out.println("Cannot load R");
 			return;
-		}		
+		}
+		System.out.println(rEngine.eval("install.packages('jsonlite')"));
+		System.out.println(rEngine.eval("library('jsonlite')"));
+	}
+	
+	public static RProcessor getRProcessor(){
+		if (singleton == null){
+			singleton = new RProcessor();
+		}
+		return singleton;
 	}
 	
 	public String evaluate(String expression) {
-		return re.eval(expression).toString();
+		return rEngine.eval(expression).toString();
 	}
 	
 	public void attachConsole(RConsole rc){
@@ -81,4 +98,25 @@ public class RProcessor {
 	public void detachConsole(){
 		rCallbacks.detachConsole();		
 	}
+	
+	private Rengine getREngine(){
+		return rEngine;
+	}
+
+	public static EvaluationResult evaluateScript(String script) {
+		Rengine re = getRProcessor().getREngine();
+		
+		putVariablesInScope(re);
+		REXP result = re.eval(script);
+		
+		return new EvaluationResult();
+	}
+	
+    private static synchronized void putVariablesInScope(Rengine re){
+    	String[][] variables = JavaProcessor.getVariables();
+    	for (String[] variable: variables){
+    		re.eval(variable[0] + "=fromJSON('" + variable[1] + "')");    		
+    	}
+    }
+
 }

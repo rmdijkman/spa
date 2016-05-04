@@ -13,9 +13,10 @@ import nl.tue.spa.core.Environment;
 import nl.tue.spa.executor.EvaluationResult;
 import nl.tue.spa.executor.EvaluationResult.ResultType;
 import nl.tue.spa.executor.java.JavaProcessor;
+import nl.tue.spa.executor.r.RConsole;
 import nl.tue.spa.gui.ConsoleGUI;
 
-public class ConsoleController implements KeyListener {
+public class ConsoleController implements KeyListener, RConsole {
 
 	ConsoleGUI gui;
 	
@@ -145,6 +146,22 @@ public class ConsoleController implements KeyListener {
 		gui.printError("\n" + text + "\n");
 		gui.printPrompt();
 		gui.setCaretPosition(gui.getTextLength());
+		caretPosition = gui.getCaretPosition();
+	}
+
+	@Override
+	public void printError(String error) {
+		gui.printError(error);
+		gui.printEntry("\n");
+		gui.printPrompt();
+		caretPosition = gui.getCaretPosition();
+	}
+
+	@Override
+	public void printMessage(String msg) {
+		gui.printError(msg);
+		gui.printEntry("\n");
+		gui.printPrompt();
 		caretPosition = gui.getCaretPosition();
 	}
 }

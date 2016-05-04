@@ -74,6 +74,11 @@ public class MainGUI extends JFrame {
 		mnNewFile.add(mntmJavaScript);
 		
 		JMenuItem mntmRScript = new JMenuItem("R Script");
+		mntmRScript.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Environment.getMainController().newRScriptFile();
+			}
+		});
 		mnNewFile.add(mntmRScript);
 
 		JMenuItem mntmGraphScript = new JMenuItem("Graph Script");

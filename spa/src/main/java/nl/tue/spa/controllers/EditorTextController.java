@@ -11,6 +11,7 @@ import nl.tue.spa.core.Environment;
 import nl.tue.spa.core.guistate.GUIState;
 import nl.tue.spa.executor.GraphScript;
 import nl.tue.spa.executor.JavaScript;
+import nl.tue.spa.executor.RScript;
 import nl.tue.spa.executor.Script;
 import nl.tue.spa.executor.Script.ScriptType;
 import nl.tue.spa.gui.EditorGUI;
@@ -55,6 +56,7 @@ public class EditorTextController extends EditorController implements KeyListene
 				Environment.getRunner().addPartyToRun(file);
 				break;
 			case TYPE_R_SCRIPT:
+				Environment.getRunner().addPartyToRun(file);
 				break;
 			default:
 				break;
@@ -98,6 +100,9 @@ public class EditorTextController extends EditorController implements KeyListene
 				graphScript.save();
 				break;
 			case TYPE_R_SCRIPT:
+				RScript rScript = new RScript(file);
+				rScript.setScript(gui.getScript());
+				rScript.save();
 				break;
 			default:
 				break;
@@ -135,6 +140,9 @@ public class EditorTextController extends EditorController implements KeyListene
 				ec.gui.setScript(graphScript.getScript());
 				break;
 			case TYPE_R_SCRIPT:
+				RScript rScript = new RScript(ec.file);
+				rScript.load();
+				ec.gui.setScript(rScript.getScript());
 				break;
 			default:
 				break;

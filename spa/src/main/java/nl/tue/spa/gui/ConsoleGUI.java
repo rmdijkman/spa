@@ -15,7 +15,6 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
 import nl.tue.spa.controllers.ConsoleController;
-import nl.tue.spa.executor.r.RConsole;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -23,7 +22,7 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-public class ConsoleGUI extends JPanel implements RConsole{
+public class ConsoleGUI extends JPanel{
 	private static final long serialVersionUID = 1L;
 	
 	private static String PROMPT = "> ";

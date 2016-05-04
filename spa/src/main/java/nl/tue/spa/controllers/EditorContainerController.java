@@ -149,4 +149,10 @@ public class EditorContainerController implements GUIStateSerializable{
 			gui.setSaveEnabled(!ec.isSaved());
 		}		
 	}
+
+	public void newRScriptFile() {
+		EditorController ec = new EditorTextController(ScriptType.TYPE_R_SCRIPT);
+		editorWindows.add(ec);
+		gui.addEditor("new R", ec);
+	}
 }
