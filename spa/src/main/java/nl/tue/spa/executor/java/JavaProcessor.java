@@ -70,6 +70,17 @@ public class JavaProcessor {
     	return result;
     }
 
+	public static synchronized void setVariables(String[][] variablesToSet) {
+		for (String[] variable: variablesToSet){
+			String name = variable[0];
+			String value = variable[1];
+			if (!value.equals(variables.get(name))){ //If it is changed, put the variable/value on the event bus.
+				Environment.getEventBus().update(name, value);
+			}
+			variables.put(name, value);
+		}
+	}
+
     /**
      * Puts the variables with their values as well as functions from the global address space in the given context and scope.
      * 

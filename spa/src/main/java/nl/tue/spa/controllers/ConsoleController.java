@@ -151,6 +151,7 @@ public class ConsoleController implements KeyListener, RConsole {
 
 	@Override
 	public void printError(String error) {
+		gui.printEntry("\n");
 		gui.printError(error);
 		gui.printEntry("\n");
 		gui.printPrompt();
@@ -159,7 +160,8 @@ public class ConsoleController implements KeyListener, RConsole {
 
 	@Override
 	public void printMessage(String msg) {
-		gui.printError(msg);
+		gui.printEntry("\n");
+		gui.printMessage(msg);
 		gui.printEntry("\n");
 		gui.printPrompt();
 		caretPosition = gui.getCaretPosition();

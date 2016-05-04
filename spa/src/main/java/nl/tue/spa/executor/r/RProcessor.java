@@ -66,7 +66,8 @@ public class RProcessor {
 		rCallbacks = new RCallbacks();
 		rCallbacks.attachConsole(Environment.getConsoleController());
 		System.out.println("Creating Rengine (with arguments)");
-		rEngine = new Rengine(new String[0], false, rCallbacks);
+		String args[] = {"--no-save"};
+		rEngine = new Rengine(args, false, rCallbacks);
 		if (!Rengine.versionCheck()) {
 			System.err.println("** Version mismatch - Java files don't match library version.");
 			System.exit(1);
@@ -76,8 +77,7 @@ public class RProcessor {
 			System.out.println("Cannot load R");
 			return;
 		}
-		System.out.println(rEngine.eval("install.packages('jsonlite')"));
-		System.out.println(rEngine.eval("library('jsonlite')"));
+		rEngine.eval("library('jsonlite')");
 	}
 	
 	public static RProcessor getRProcessor(){
@@ -107,7 +107,8 @@ public class RProcessor {
 		Rengine re = getRProcessor().getREngine();
 		
 		putVariablesInScope(re);
-		REXP result = re.eval(script);
+		re.eval(script);
+		getVariablesFromScope(re);
 		
 		return new EvaluationResult();
 	}
@@ -117,6 +118,19 @@ public class RProcessor {
     	for (String[] variable: variables){
     		re.eval(variable[0] + "=fromJSON('" + variable[1] + "')");    		
     	}
+    }
+    
+    private static synchronized void getVariablesFromScope(Rengine re){
+    	REXP variableExp = re.eval("ls()");
+    	String variables[] = variableExp.asStringArray();
+    	String result[][] = new String[variables.length][2];
+
+    	for (int i = 0; i < variables.length; i++){
+    		result[i][0] = variables[i];
+    		result[i][1] = re.eval("toJSON("+variables[i]+",auto_unbox = TRUE)").asString();
+    	}
+    	
+    	JavaProcessor.setVariables(result);
     }
 
 }
