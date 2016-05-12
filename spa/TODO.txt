@@ -1,5 +1,4 @@
 R integration:
-- prevent functions from being exported to R
 - make sure that errors in the R script are shown on the console 
 - check whether the correct library location is used on Windows
 - be smart about how R_HOME and the JRI library location are set, to help the user

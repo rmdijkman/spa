@@ -51,7 +51,7 @@ public class GraphScript extends Script{
 
 	@Override
 	public EvaluationResult execute() {
-		String variables = "<script>\n" + JavaProcessor.getVariablesAsScript() + "</script>\n";
+		String variables = "<script>\n" + JavaProcessor.getVariablesAndFunctionsAsScript() + "</script>\n";
 		int headIndex = script.indexOf("<head>");
 		if (headIndex != -1){
 			script = script.substring(0, headIndex + 6) + variables + script.substring(headIndex + 6);

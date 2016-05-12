@@ -142,7 +142,7 @@ public class MainController implements GUIStateSerializable{
 		gs.putStateVar("WINDOW_STATE", guiMain.getExtendedState());		
 		gs.putStateVar("CONSOLE_VISIBLE", consoleVisible);
 		gs.putStateVar("VARIABLES_VISIBLE", variablesVisible);
-		gs.putStateVar("VARIABLE_VALUES", JavaProcessor.getVariablesAsScript());
+		gs.putStateVar("VARIABLE_VALUES", JavaProcessor.getVariablesAndFunctionsAsScript());
 		gs.putStateVar("EDITOR_VISIBLE", editorVisible);
 		gs.putStateVar("EDITOR", Environment.getEditorContainerController().getState());
 		gs.putStateVar("ACTIVE_VISIBLE", activeVisible);

@@ -31,12 +31,12 @@ public class VariablesController{
 	}
 
 	public void clearVariables() {
-		JavaProcessor.clearVariables();
+		JavaProcessor.clearVariablesAndFunctions();
 		Environment.getMainController().updateJavaScope();
 	}
 
 	public void removeVariable(String variableName) {
-		JavaProcessor.removeVariable(variableName);
+		JavaProcessor.removeVariableOrFunction(variableName);
 		Environment.getMainController().updateJavaScope();
 	}
 

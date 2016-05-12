@@ -13,13 +13,14 @@ import nl.tue.spa.executor.EvaluationResult.ResultType;
 public class JavaProcessor {
 
 	private static Map<String,String> variables = new HashMap<String,String>(); //Shared variable space to make the whole thing thread safe
+	private static Map<String,String> functions = new HashMap<String,String>(); //Shared function space to make the whole thing thread safe
 	
-	private static final String[] reservedVariableNames = {"eventbus","runner","console","update","run"}; 
+	private static final String[] reservedNames = {"eventbus","runner","console","update","run"}; 
 	
     public static EvaluationResult evaluate(Context cx, Scriptable scope, String expression, String sourceName, int lineNumber){
     	String result = null;
     	try{
-    		putVariablesInScope(cx, scope);
+    		putVariablesAndFunctionsInScope(cx, scope);
     		cx.evaluateString(scope, "console = {log: function(msg){Packages.nl.tue.spa.core.Environment.getConsoleController().log(msg);}}", "", 0, null);
     		cx.evaluateString(scope, "eventbus = {subscribe: function(party,variable){Packages.nl.tue.spa.core.Environment.getEventBus().subscribe(party,variable);},"
     				+ "unsubscribe: function(party){Packages.nl.tue.spa.core.Environment.getEventBus().unsubscribe(party);}}", "", 0, null);
@@ -29,7 +30,7 @@ public class JavaProcessor {
     		if (returnedValue != Context.getUndefinedValue()){
     			result = Context.toString(returnedValue);
     		}
-    		setVariablesFromScope(cx, scope);
+    		setVariablesAndFunctionsFromScope(cx, scope);
     	}catch (Exception e){
     		return new EvaluationResult(e.getLocalizedMessage(), ResultType.ERROR);
     	}
@@ -70,6 +71,17 @@ public class JavaProcessor {
     	return result;
     }
 
+    public static synchronized String[][] getFunctions(){
+    	String result[][] = new String[functions.size()][2];
+    	int i = 0;
+    	for (Map.Entry<String, String> me: functions.entrySet()){
+    		result[i][0] = me.getKey();
+    		result[i][1] = me.getValue();
+    		i++;
+    	}
+    	return result;
+    }
+
 	public static synchronized void setVariables(String[][] variablesToSet) {
 		for (String[] variable: variablesToSet){
 			String name = variable[0];
@@ -87,8 +99,8 @@ public class JavaProcessor {
      * @param cx the context into which to put the variables.
      * @param scope the scope into which to put the variables.
      */
-    private static synchronized void putVariablesInScope(Context cx, Scriptable scope){
-    	String scriptedVariables = getVariablesAsScript();
+    private static synchronized void putVariablesAndFunctionsInScope(Context cx, Scriptable scope){
+    	String scriptedVariables = getVariablesAndFunctionsAsScript();
 		cx.evaluateString(scope, scriptedVariables, "VARIABLE INITIALIZATION", 1, null);
     }
     
@@ -100,7 +112,7 @@ public class JavaProcessor {
      * @param cx the context from which to get the variables.
      * @param scope the scope from which to get the variables.
      */
-    private static synchronized void setVariablesFromScope(Context cx, Scriptable scope){    	
+    private static synchronized void setVariablesAndFunctionsFromScope(Context cx, Scriptable scope){    	
     	Object variableNames[] = scope.getIds();
     	for (int i = variableNames.length-1; i >= 0; i--){
     		String variable = variableNames[i].toString();
@@ -108,13 +120,14 @@ public class JavaProcessor {
     			String jsonValue = "";
     			if (Context.toString(cx.evaluateString(scope, "typeof(" + variable.toString() +")", "", 1, null)).equals("function")){
     				jsonValue = Context.toString(cx.evaluateString(scope, variable.toString() +".toString()", "", 1, null));    			
+        			functions.put(variable, jsonValue);
     			}else{
     				jsonValue = Context.toString(cx.evaluateString(scope, "JSON.stringify(" + variable.toString() +")", "", 1, null));
     				if (!jsonValue.equals(variables.get(variable))){ //If it is changed, put the variable/value on the event bus.
     					Environment.getEventBus().update(variable, jsonValue);
     				}
+        			variables.put(variable, jsonValue);
     			}
-    			variables.put(variable, jsonValue);
     		}
     	}
     }
@@ -125,9 +138,12 @@ public class JavaProcessor {
      * @param includeScriptTags
      * @return
      */
-    public static synchronized String getVariablesAsScript(){
+    public static synchronized String getVariablesAndFunctionsAsScript(){
     	String result = "";
     	for (Map.Entry<String, String> me: variables.entrySet()){
+   			result += "var " + me.getKey() + " = " + me.getValue() + ";\n";
+    	}
+    	for (Map.Entry<String, String> me: functions.entrySet()){
    			result += "var " + me.getKey() + " = " + me.getValue() + ";\n";
     	}
     	return result;
@@ -136,8 +152,9 @@ public class JavaProcessor {
     /**
      * Removes all variables from the global address space. 
      */
-	public static synchronized void clearVariables() {
+	public static synchronized void clearVariablesAndFunctions() {
 		variables = new HashMap<String,String>();
+		functions = new HashMap<String,String>();
 	}
 
 	/**
@@ -145,12 +162,13 @@ public class JavaProcessor {
 	 * 
 	 * @param variableName the name of the variable to remove.
 	 */
-	public static synchronized void removeVariable(String variableName) {
+	public static synchronized void removeVariableOrFunction(String variableName) {
 		variables.remove(variableName);
+		functions.remove(variableName);
 	}
 	
 	private static boolean isReserved(String variableName){
-		for (String reservedVariableName: reservedVariableNames){
+		for (String reservedVariableName: reservedNames){
 			if (reservedVariableName.equals(variableName)){
 				return true;
 			}
