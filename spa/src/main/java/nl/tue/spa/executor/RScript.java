@@ -30,7 +30,7 @@ public class RScript extends Script{
 
 	public EvaluationResult execute(){
 		MainController mc = Environment.getMainController();
-		EvaluationResult er = RProcessor.evaluateScript(script);
+		EvaluationResult er = RProcessor.evaluateFile(file);
 		if (er.getType() != ResultType.UNDEFINED){
 			mc.printEntry("\n");
 			mc.printResult(er);

@@ -6,6 +6,8 @@ import nl.tue.spa.core.Environment;
 import nl.tue.spa.executor.EvaluationResult;
 import nl.tue.spa.executor.java.JavaProcessor;
 
+import java.io.File;
+
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RMainLoopCallbacks;
 
@@ -22,7 +24,11 @@ class RCallbacks implements RMainLoopCallbacks {
 	
 	public void rWriteConsole(Rengine re, String text, int oType) {
 		if (rc != null){
-			rc.printMessage(text);
+			if (oType == 1){
+				rc.printError(text.trim());
+			}else{
+				rc.printMessage(text.trim());
+			}
 		}
 	}
 
@@ -67,7 +73,7 @@ public class RProcessor {
 		rCallbacks.attachConsole(Environment.getConsoleController());
 		System.out.println("Creating Rengine (with arguments)");
 		String args[] = {"--no-save"};
-		rEngine = new Rengine(args, false, rCallbacks);
+		rEngine = new Rengine(args, false, rCallbacks);		
 		if (!Rengine.versionCheck()) {
 			System.err.println("** Version mismatch - Java files don't match library version.");
 			System.exit(1);
@@ -102,12 +108,15 @@ public class RProcessor {
 	private Rengine getREngine(){
 		return rEngine;
 	}
+	
+	
 
-	public static EvaluationResult evaluateScript(String script) {
+	public static EvaluationResult evaluateFile(File file) {
 		Rengine re = getRProcessor().getREngine();
 		
 		putVariablesInScope(re);
-		re.eval(script);
+		re.eval("options(show.error.locations=TRUE)",false);
+		re.eval("source('"+file.getAbsolutePath().replace('\\', '/')+"', keep.source=TRUE)",false);
 		getVariablesFromScope(re);
 		
 		return new EvaluationResult();

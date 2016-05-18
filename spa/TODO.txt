@@ -1,6 +1,3 @@
-R integration:
-- make sure that errors in the R script are shown on the console 
-- be smart about how R_HOME and the JRI library location are set, to help the user
 Create projects
 Create visualization templates to more easily create visualizations of different types
 
@@ -21,6 +18,8 @@ MINOR FEATURES
 - VariablesWindow: put functions in a separate list, do not list the contents of the function
 
 - Properties: can return exception on load/save, handle that
+
+- RProcessor: be smart about how R_HOME and the JRI library location are set, to help the user
 
 MAJOR FEATURES
 Additional component: library (this is basically a js or R file)
